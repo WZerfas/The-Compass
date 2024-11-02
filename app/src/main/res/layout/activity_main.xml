@@ -5,15 +5,55 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#000000">>
 
+    <ImageView
+        android:id="@+id/mapIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:contentDescription="Map Icon"
+        android:src="@mipmap/ic_map"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Settings Icon -->
+    <ImageView
+        android:id="@+id/settingsIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:contentDescription="Settings Icon"
+        android:src="@mipmap/ic_settings"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Compass Needle -->
+    <ImageView
+        android:id="@+id/compassNeedle"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="32dp"
+        android:contentDescription="Compass Needle"
+        android:src="@mipmap/ic_compass"
+        app:layout_constraintTop_toBottomOf="@+id/mapIcon"
+        app:layout_constraintBottom_toTopOf="@+id/degreeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Direction and Coordinates Text -->
     <TextView
+        android:id="@+id/degreeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="298° NW\n43°4'32\ N, 89°24'43\ W\nMadison, WI\n890ft Elevation"
+        android:textColor="#FFFFFF"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/compassNeedle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
