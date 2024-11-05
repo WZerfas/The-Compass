@@ -13,6 +13,13 @@
         android:theme="@style/Theme.Thecompass"
         tools:targetApi="31">
         <activity
+            android:name=".NavigationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SettingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Thecompass" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
