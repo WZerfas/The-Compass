@@ -1,11 +1,13 @@
 package com.cs407.the_compass
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.ImageView
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         val degree = event?.values?.get(0)?.let { Math.round(it) } ?: return
+        Log.d(TAG,"onSensorChanged: " + degree)
         rotationTV.text = "$degree degrees"
         val rotationAnimation = RotateAnimation(
             currentDegree,
