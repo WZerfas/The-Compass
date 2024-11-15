@@ -56,9 +56,26 @@ class CompassManager (
                 fun normalizeDegree(degree:Float):Float{
                     return (degree + 360)%360
                 }
-                currentDegree = alpha * normalizeDegree(degree) + (1-alpha) * currentDegree
 
-                degreeTextView.text = "${degree.toInt()} degrees"
+                fun getDirection(degree:Float):String{
+                    return when{
+                        degree >= 337.5 || degree < 22.5 -> "N"
+                        degree >= 22.5 || degree < 67.5 -> "NE"
+                        degree >= 67.5 || degree < 112.5 -> "E"
+                        degree >= 112.5 || degree < 157.5 -> "SE"
+                        degree >= 157.5 || degree < 202.5 -> "S"
+                        degree >= 202.5 || degree < 247.5 -> "SW"
+                        degree >= 247.5 || degree < 292.5 -> "W"
+                        degree >= 292.5 || degree < 337.5 -> "NW"
+                        else -> "N" //Should not reach here, bad thing happen.
+                    }
+                }
+
+                val normalizedDegree = normalizeDegree(degree)
+                currentDegree = alpha * normalizedDegree + (1-alpha) * currentDegree
+
+                val direction = getDirection(normalizedDegree)
+                degreeTextView.text = "${normalizedDegree.toInt()}º $direction"
                 compassView.rotation = -currentDegree
             }
         }
