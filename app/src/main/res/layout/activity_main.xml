@@ -15,20 +15,20 @@
         android:layout_height="50dp"
         android:layout_margin="20dp"
         android:contentDescription="Map Icon"
-        android:src="@mipmap/ic_map"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:src="@android:drawable/ic_dialog_map"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Settings Icon -->
     <ImageView
-        android:id="@+id/settingsIcon"
+        android:id="@+id/btnSetting"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="20dp"
         android:contentDescription="Settings Icon"
-        android:src="@mipmap/ic_settings"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:src="@android:drawable/ic_menu_manage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Compass Needle -->
     <ImageView

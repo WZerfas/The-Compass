@@ -1,41 +1,31 @@
 package com.cs407.the_compass
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.content.Intent
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.cs407.the_compass.databinding.ActivitySettingBinding
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.cs407.the_compass.util.CompassManager
 
 class SettingActivity : AppCompatActivity() {
-
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivitySettingBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_setting)
 
-        binding = ActivitySettingBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val btnHome = findViewById<ImageView>(R.id.btnHome)
+        val btnMap = findViewById<ImageView>(R.id.btnMap)
 
-        setSupportActionBar(binding.toolbar)
-
-        val navController = findNavController(R.id.nav_host_fragment_content_setting)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
+        btnHome.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
-    }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_setting)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+        btnMap.setOnClickListener{
+            val intent = Intent(this,NavigationActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

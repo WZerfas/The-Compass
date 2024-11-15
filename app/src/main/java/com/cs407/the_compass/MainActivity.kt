@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         val compassImage = findViewById<ImageView>(R.id.compassNeedle)
         val degreeText = findViewById<TextView>(R.id.degreeView)
         val btnMap = findViewById<ImageView>(R.id.btnMap)
+        val btnSetting = findViewById<ImageView>(R.id.btnSetting)
 
         compassManager = CompassManager(this, compassImage, degreeText)
 
@@ -24,6 +25,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, NavigationActivity::class.java)
             startActivity(intent)
         }
+        btnSetting.setOnClickListener {
+            val intent = Intent(this, SettingActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 
     override fun onResume() {
