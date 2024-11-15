@@ -10,7 +10,7 @@
     android:background="#000000">
 
     <ImageView
-        android:id="@+id/mapIcon"
+        android:id="@+id/btnMap"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="20dp"
@@ -38,7 +38,7 @@
         android:layout_marginTop="100dp"
         android:contentDescription="Compass Needle"
         app:srcCompat="@drawable/compass"
-        app:layout_constraintTop_toBottomOf="@+id/mapIcon"
+        app:layout_constraintTop_toBottomOf="@+id/btnMap"
         app:layout_constraintBottom_toTopOf="@+id/degreeText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
