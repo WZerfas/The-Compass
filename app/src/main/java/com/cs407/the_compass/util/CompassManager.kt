@@ -60,13 +60,13 @@ class CompassManager (
                 fun getDirection(degree:Float):String{
                     return when{
                         degree >= 337.5 || degree < 22.5 -> "N"
-                        degree >= 22.5 || degree < 67.5 -> "NE"
-                        degree >= 67.5 || degree < 112.5 -> "E"
-                        degree >= 112.5 || degree < 157.5 -> "SE"
-                        degree >= 157.5 || degree < 202.5 -> "S"
-                        degree >= 202.5 || degree < 247.5 -> "SW"
-                        degree >= 247.5 || degree < 292.5 -> "W"
-                        degree >= 292.5 || degree < 337.5 -> "NW"
+                        degree >= 22.5 && degree < 67.5 -> "NE"
+                        degree >= 67.5 && degree < 112.5 -> "E"
+                        degree >= 112.5 && degree < 157.5 -> "SE"
+                        degree >= 157.5 && degree < 202.5 -> "S"
+                        degree >= 202.5 && degree < 247.5 -> "SW"
+                        degree >= 247.5 && degree < 292.5 -> "W"
+                        degree >= 292.5 && degree < 337.5 -> "NW"
                         else -> "N" //Should not reach here, bad thing happen.
                     }
                 }
