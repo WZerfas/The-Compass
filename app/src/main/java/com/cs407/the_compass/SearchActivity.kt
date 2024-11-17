@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,7 @@ class SearchActivity : AppCompatActivity() {
         val doSearchBtn = findViewById<ImageView>(R.id.btnConfirmSearch)
         val searchBar = findViewById<EditText>(R.id.searchText)
         val searchModeSwitch = findViewById<Switch>(R.id.searchModeSwitch)
+        val modeText = findViewById<TextView>(R.id.modeTextView)
 
         searchModeSwitch.isChecked = searchingCoordinate
 
@@ -34,6 +36,11 @@ class SearchActivity : AppCompatActivity() {
         searchModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             searchingCoordinate = isChecked
             Toast.makeText(this, searchingCoordinate.toString(), Toast.LENGTH_SHORT).show()
+            if (searchingCoordinate){
+                modeText.text = "Coordinate Mode"
+            }else{
+                modeText.text = "Address Mode"
+            }
         }
 
         returnBtn.setOnClickListener {
