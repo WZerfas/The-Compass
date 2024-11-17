@@ -13,19 +13,19 @@ import com.cs407.the_compass.util.CompassManager
 class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setting)
+        setContentView(R.layout.fragment_settings)
 
-        val btnHome = findViewById<ImageView>(R.id.btnHome)
-        val btnMap = findViewById<ImageView>(R.id.btnMap)
+        val btnHome = findViewById<ImageView>(R.id.closeButton)
+        //val btnMap = findViewById<ImageView>(R.id.btnMap)
 
         btnHome.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
-        btnMap.setOnClickListener{
+        /**btnMap.setOnClickListener{
             val intent = Intent(this,NavigationActivity::class.java)
             startActivity(intent)
-        }
+        } */
     }
 }
