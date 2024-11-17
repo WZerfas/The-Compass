@@ -52,7 +52,7 @@ class CompassManager (
                 val degree = Math.toDegrees(orientation[0].toDouble()).toFloat()
 
                 // Smooth the degree value
-                val alpha = 0.1f //Change this between 0 and 1 for smoother rotation
+                val alpha = 0.03f //Change this between 0 and 1 for smoother rotation
                 fun normalizeDegree(degree:Float):Float{
                     return (degree + 360)%360
                 }
@@ -74,9 +74,11 @@ class CompassManager (
                 val normalizedDegree = normalizeDegree(degree)
                 currentDegree = alpha * normalizedDegree + (1-alpha) * currentDegree
 
-                val direction = getDirection(normalizedDegree)
-                degreeTextView.text = "${normalizedDegree.toInt()}º $direction"
-                compassView.rotation = -currentDegree
+                if (Math.abs(normalizedDegree-currentDegree)>1f){
+                    val direction = getDirection(normalizedDegree)
+                    degreeTextView.text = "${normalizedDegree.toInt()}º $direction"
+                    compassView.rotation = -currentDegree
+                }
             }
         }
     }

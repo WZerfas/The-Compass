@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         } else{
             if (coordinate >= 0) "E" else "W"
         }
-        return String.format("%d°%02d'%02d\" %s", degrees, minutes, seconds, direction)
+        return String.format("%d°%02d'%02d\" %s ", degrees, minutes, seconds, direction)
     }
 
     private fun updateLocationUI(latitude:Double,longitude:Double){
