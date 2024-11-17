@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsFragment"
+    android:background="#000000">
+
+    <!-- Close Button -->
+    <ImageView
+        android:id="@+id/closeButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:contentDescription="Close"
+        android:src="@mipmap/ic_close"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Option: Set location service intervals -->
+    <TextView
+        android:id="@+id/locationServiceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:text="Set location service intervals"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintTop_toBottomOf="@+id/closeButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Option: Reception alert -->
+    <TextView
+        android:id="@+id/receptionAlertText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="Reception alert"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintTop_toBottomOf="@+id/locationServiceText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Option: Turn off Complex Animation -->
+    <TextView
+        android:id="@+id/complexAnimationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:text="Turn off Complex Animation"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/receptionAlertText" />
+
+</FrameLayout>
