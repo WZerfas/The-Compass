@@ -14,12 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.cs407.the_compass.util.CompassManager
 import com.cs407.the_compass.util.CurrentLocation
+import com.cs407.the_compass.util.ElevationManager
 import com.google.android.gms.location.LocationServices
-import kotlin.math.min
 
 class MainActivity : AppCompatActivity() {
     private lateinit var compassManager: CompassManager
     private lateinit var currentLocation: CurrentLocation
+    private lateinit var elevationManager: ElevationManager
+    private lateinit var altitudeTextView: TextView
+    private lateinit var pressureTextView: TextView
     private val fusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
 
     private val permissionLauncher = registerForActivityResult(
@@ -54,8 +57,6 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -64,6 +65,19 @@ class MainActivity : AppCompatActivity() {
         val degreeTextView = findViewById<TextView>(R.id.degreeView)
         val btnMap = findViewById<ImageView>(R.id.btnMap)
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
+
+        altitudeTextView = findViewById(R.id.altitudeText)
+        pressureTextView = findViewById(R.id.pressureText)
+
+        elevationManager = ElevationManager(this){elevation, pressure ->
+            if (elevation != null && pressure != null){
+                altitudeTextView.text = "Altitude: ${elevation.toInt()} m"
+                pressureTextView.text = "Pressure: ${pressure.toInt()} hPa"
+            } else{
+                altitudeTextView.text = "Altitude unavailable"
+                pressureTextView.text = "Pressure unavailable"
+            }
+        }
 
         compassManager = CompassManager(this, compassImage, degreeTextView)
         currentLocation = CurrentLocation(this,fusedLocationProviderClient)
@@ -88,15 +102,16 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
     override fun onResume() {
         super.onResume()
         compassManager.start()
+        elevationManager.startListening()
     }
 
     override fun onPause() {
         super.onPause()
         compassManager.stop()
+        elevationManager.stopListening()
     }
 
     private fun convertToDMS(coordinate:Double,isLatitude:Boolean):String{
