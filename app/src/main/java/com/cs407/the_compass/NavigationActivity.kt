@@ -17,6 +17,7 @@ class NavigationActivity : AppCompatActivity() {
 
         val btnHome = findViewById<ImageView>(R.id.btnHome)
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
+        val btnSearch = findViewById<ImageView>(R.id.btnSearch)
 
         btnHome.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -25,6 +26,11 @@ class NavigationActivity : AppCompatActivity() {
 
         btnSetting.setOnClickListener{
             val intent = Intent(this,SettingActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnSearch.setOnClickListener{
+            val intent = Intent(this,SearchActivity::class.java)
             startActivity(intent)
         }
     }

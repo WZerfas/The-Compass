@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Declare features required by the app -->
-    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
-    <uses-feature android:name="android.hardware.sensor.compass" android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.compass"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -20,24 +23,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Thecompass"
         tools:targetApi="31">
-
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
         <!-- Navigation Activity -->
         <activity
             android:name=".NavigationActivity"
-            android:exported="false" />
-
-        <!-- Settings Activity -->
+            android:exported="false" /> <!-- Settings Activity -->
         <activity
             android:name=".SettingActivity"
             android:exported="false"
-            android:theme="@style/Theme.Thecompass" />
-
-        <!-- Main Activity (Launcher) -->
+            android:theme="@style/Theme.Thecompass" /> <!-- Main Activity (Launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
