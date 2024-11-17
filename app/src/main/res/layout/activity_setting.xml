@@ -12,51 +12,37 @@
     <ImageView
         android:id="@+id/btnHome"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
+        android:layout_height="0dp"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="26dp"
+        android:layout_marginEnd="265dp"
         android:contentDescription="Home Icon"
         android:src="@android:drawable/ic_menu_mylocation"
-        app:layout_constraintEnd_toStartOf="@+id/searchText"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMap"
+        app:layout_constraintEnd_toStartOf="@+id/btnMap"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/btnMap" />
 
     <!-- Settings Icon -->
     <ImageView
         android:id="@+id/btnMap"
-        android:layout_width="50dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:contentDescription="Settings Icon"
         android:src="@android:drawable/ic_dialog_map"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnHome"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="215dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="346dp"
+        android:layout_marginTop="170dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchText"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_preferences" />
 
-    <EditText
-        android:id="@+id/searchText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="105dp"
-        android:ems="10"
-        android:textColor="#FFFFFF"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnHome"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
