@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class SearchActivity : AppCompatActivity() {
+    private var searchingCoordinate = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,6 +26,15 @@ class SearchActivity : AppCompatActivity() {
         val returnBtn = findViewById<ImageView>(R.id.btnReturn)
         val doSearchBtn = findViewById<ImageView>(R.id.btnConfirmSearch)
         val searchBar = findViewById<EditText>(R.id.searchText)
+        val searchModeSwitch = findViewById<Switch>(R.id.searchModeSwitch)
+
+        searchModeSwitch.isChecked = searchingCoordinate
+
+        // Handle switch state changes
+        searchModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            searchingCoordinate = isChecked
+            Toast.makeText(this, searchingCoordinate.toString(), Toast.LENGTH_SHORT).show()
+        }
 
         returnBtn.setOnClickListener {
             val intent = Intent(this, NavigationActivity::class.java)
@@ -32,7 +43,12 @@ class SearchActivity : AppCompatActivity() {
 
         doSearchBtn.setOnClickListener {
             val userInputText = searchBar.text.toString()
-            Toast.makeText(this, "Searching: "+userInputText, Toast.LENGTH_SHORT).show()
+            if (searchingCoordinate){
+                Toast.makeText(this, "Searching Coordinate: "+userInputText, Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(this, "Searching Specific Location: "+userInputText, Toast.LENGTH_SHORT).show()
+            }
+
         }
 
     }
