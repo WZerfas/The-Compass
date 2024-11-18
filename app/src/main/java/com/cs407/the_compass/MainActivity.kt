@@ -8,6 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.Manifest
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +20,7 @@ import com.cs407.the_compass.util.CurrentLocation
 import com.cs407.the_compass.util.ElevationManager
 import com.google.android.gms.location.LocationServices
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),SensorEventListener {
     private lateinit var compassManager: CompassManager
     private lateinit var currentLocation: CurrentLocation
     private lateinit var elevationManager: ElevationManager
@@ -114,6 +117,14 @@ class MainActivity : AppCompatActivity() {
         elevationManager.stopListening()
     }
 
+    override fun onSensorChanged(event: SensorEvent?){
+        if (event?.sensor?.type == Sensor.TYPE_ORIENTATION){
+            val degree = Math.round(event.values[0])
+            findViewById<ImageView>(R.id.compassNeedle).rotation = -degree.toFloat()
+            findViewById<TextView>(R.id.degreeView).text = "Heading: ${degree}º"
+        }
+    }
+
     private fun convertToDMS(coordinate:Double,isLatitude:Boolean):String{
         val absolute = Math.abs(coordinate)
         val degrees = absolute.toInt()
@@ -147,4 +158,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onAccuracyChanged(sensor: Sensor?,accuracy:Int) {
+
+    }
+
 }

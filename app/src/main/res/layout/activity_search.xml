@@ -8,6 +8,7 @@
     android:background="#000000"
     tools:context=".SearchActivity">
 
+    <!-- Confirm Button -->
     <ImageView
         android:id="@+id/btnConfirmSearch"
         android:layout_width="69dp"
@@ -18,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_search" />
 
+    <!-- Return Button -->
     <ImageView
         android:id="@+id/btnReturn"
         android:layout_width="0dp"
@@ -30,21 +32,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
+    <!-- Coordinate Input Field -->
     <EditText
         android:id="@+id/searchText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="99dp"
-        android:ems="10"
-        android:hint="Search Destination Here"
+        android:layout_marginEnd="16dp"
+        android:hint="Enter coordinates (lat,lon)"
         android:inputType="text"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnReturn"
-        app:layout_constraintTop_toTopOf="@+id/btnConfirmSearch" />
+        app:layout_constraintStart_toStartOf="@+id/btnReturn"
+        app:layout_constraintTop_toBottomOf="@+id/btnConfirmSearch" />
 
+    <!-- Mode Switch -->
     <Switch
         android:id="@+id/searchModeSwitch"
         android:layout_width="wrap_content"
@@ -62,6 +65,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+    <!-- Mode Text -->
     <TextView
         android:id="@+id/modeTextView"
         android:layout_width="wrap_content"
