@@ -11,13 +11,13 @@
     <!-- Confirm Button -->
     <ImageView
         android:id="@+id/btnConfirmSearch"
-        android:layout_width="69dp"
-        android:layout_height="79dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_search" />
+        app:srcCompat="@drawable/search_icon" />
 
     <!-- Return Button -->
     <ImageView
