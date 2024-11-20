@@ -53,14 +53,18 @@ class CompassManager(
 
                 // Normalize and smooth the degree
                 val normalizedDegree = (degree % 360 + 360) % 360
-                val alpha = if (Math.abs(normalizedDegree - currentDegree) > 10) 0.1f else 0.03f
-                currentDegree = alpha * normalizedDegree + (1 - alpha) * currentDegree
 
-                if (Math.abs(normalizedDegree - currentDegree) > 1f) {
-                    val direction = getDirection(normalizedDegree)
-                    degreeTextView.text = "${normalizedDegree.toInt()}º $direction"
-                    compassView.rotation = -currentDegree
-                }
+                // Calculate the shortest path for rotation, instead of go around
+                var delta = normalizedDegree - currentDegree
+                if (delta > 180) delta -= 360
+                if (delta < -180) delta += 360
+                currentDegree += delta * 0.1f // Smoothing factor for animation
+                currentDegree = (currentDegree % 360 + 360) % 360
+
+                // Update UI
+                val direction = getDirection(currentDegree)
+                degreeTextView.text = "${currentDegree.toInt()}º $direction"
+                compassView.rotation = -currentDegree
             }
         }
     }

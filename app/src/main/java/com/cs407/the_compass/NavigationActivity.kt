@@ -148,7 +148,13 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
                 val orientation = FloatArray(3)
                 SensorManager.getOrientation(R, orientation)
                 val azimuthInRadians = orientation[0]
-                currentAzimuth = Math.toDegrees(azimuthInRadians.toDouble()).toFloat()
+                val newAzimuth = Math.toDegrees(azimuthInRadians.toDouble()).toFloat()
+                val normalizedAzimuth = (newAzimuth + 360) % 360
+
+                // Smoothing factor
+                val smoothFactor = 0.1f
+                currentAzimuth = currentAzimuth + smoothFactor * (normalizedAzimuth - currentAzimuth)
+
                 currentAzimuth = (currentAzimuth + 360) % 360
                 updateArrow()
             }
