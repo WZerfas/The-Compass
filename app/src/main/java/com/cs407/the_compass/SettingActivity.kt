@@ -19,8 +19,9 @@ class SettingActivity : AppCompatActivity() {
         //val btnMap = findViewById<ImageView>(R.id.btnMap)
 
         btnHome.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, MainActivity::class.java)
+//            startActivity(intent)
+            finish()
         }
 
         /**btnMap.setOnClickListener{

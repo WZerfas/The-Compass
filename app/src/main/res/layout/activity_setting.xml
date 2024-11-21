@@ -11,26 +11,26 @@
     <!-- Home Icon -->
     <ImageView
         android:id="@+id/btnHome"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="265dp"
         android:contentDescription="Home Icon"
-        android:src="@android:drawable/ic_menu_mylocation"
+        android:src="@drawable/navigation_icon"
         app:layout_constraintBottom_toBottomOf="@+id/btnMap"
         app:layout_constraintEnd_toStartOf="@+id/btnMap"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btnMap" />
 
-    <!-- Settings Icon -->
+    <!-- Map Icon -->
     <ImageView
         android:id="@+id/btnMap"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:contentDescription="Settings Icon"
-        android:src="@android:drawable/ic_dialog_map"
+        android:contentDescription="Map Icon"
+        android:src="@drawable/map_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnHome"
         app:layout_constraintTop_toTopOf="parent" />
