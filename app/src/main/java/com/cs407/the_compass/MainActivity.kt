@@ -102,9 +102,17 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // Initialize the database access
+        val databaseAccess = DatabaseAccess.getInstance(this)
+
+        // Open the database and log tables
+        databaseAccess.open()
+        databaseAccess.logTables()
+        databaseAccess.close()
         // Fetch the address from the database with id = 1
         // TODO Call the method
-        /**fetchAddressFromDatabase() */
+        fetchAddressFromDatabase()
+        //databaseAccess.close()
     }
 
     override fun onResume() {
@@ -141,8 +149,8 @@ class MainActivity : AppCompatActivity() {
         locationTextView.text = "$latitudeDMS $longitudeDMS"
     }
 
-    /**
-     * TODO fetch the item with id = 1 in the database
+
+    // TODO fetch the item with id = 1 in the database
     private fun fetchAddressFromDatabase() {
         val dbAccess = DatabaseAccess.getInstance(this)
         dbAccess.open()
@@ -155,7 +163,7 @@ class MainActivity : AppCompatActivity() {
 
         dbAccess.close()
     }
-    */
+
     private fun getCurrentLocation() {
         currentLocation.fetchLocation(object: CurrentLocation.LocationResultCallback {
             override fun onLocationRetrieved(latitude: Double, longitude: Double) {
