@@ -4,13 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log // For logging
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.Manifest
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +18,7 @@ import com.cs407.the_compass.util.CurrentLocation
 import com.cs407.the_compass.util.ElevationManager
 import com.google.android.gms.location.LocationServices
 
-class MainActivity : AppCompatActivity(),SensorEventListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var compassManager: CompassManager
     private lateinit var currentLocation: CurrentLocation
     private lateinit var elevationManager: ElevationManager
@@ -72,18 +70,18 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
         altitudeTextView = findViewById(R.id.altitudeText)
         pressureTextView = findViewById(R.id.pressureText)
 
-        elevationManager = ElevationManager(this){elevation, pressure ->
-            if (elevation != null && pressure != null){
+        elevationManager = ElevationManager(this) { elevation, pressure ->
+            if (elevation != null && pressure != null) {
                 altitudeTextView.text = "Altitude: ${elevation.toInt()} m"
                 pressureTextView.text = "Pressure: ${pressure.toInt()} hPa"
-            } else{
+            } else {
                 altitudeTextView.text = "Altitude unavailable"
                 pressureTextView.text = "Pressure unavailable"
             }
         }
 
         compassManager = CompassManager(this, compassImage, degreeTextView)
-        currentLocation = CurrentLocation(this,fusedLocationProviderClient)
+        currentLocation = CurrentLocation(this, fusedLocationProviderClient)
 
         btnMap.setOnClickListener {
             val intent = Intent(this, NavigationActivity::class.java)
@@ -95,14 +93,26 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
         }
 
         // Check location permission and fetch location
-        currentLocation.checkPermissionsAndFetchLocation(permissionLauncher, object:CurrentLocation.LocationResultCallback{
-            override fun onLocationRetrieved(latitude:Double,longitude:Double){
-                updateLocationUI(latitude,longitude)
+        currentLocation.checkPermissionsAndFetchLocation(permissionLauncher, object: CurrentLocation.LocationResultCallback {
+            override fun onLocationRetrieved(latitude: Double, longitude: Double) {
+                updateLocationUI(latitude, longitude)
             }
-            override fun onError(message:String){
-                Toast.makeText(this@MainActivity,message,Toast.LENGTH_SHORT).show()
+            override fun onError(message: String) {
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
         })
+
+        // Initialize the database access
+        val databaseAccess = DatabaseAccess.getInstance(this)
+
+        // Open the database and log tables
+        databaseAccess.open()
+        databaseAccess.logTables()
+        databaseAccess.close()
+        // Fetch the address from the database with id = 1
+        // TODO Call the method
+        fetchAddressFromDatabase()
+        //databaseAccess.close()
     }
 
     override fun onResume() {
@@ -117,50 +127,52 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
         elevationManager.stopListening()
     }
 
-    override fun onSensorChanged(event: SensorEvent?){
-        if (event?.sensor?.type == Sensor.TYPE_ORIENTATION){
-            val degree = Math.round(event.values[0])
-            findViewById<ImageView>(R.id.compassNeedle).rotation = -degree.toFloat()
-            findViewById<TextView>(R.id.degreeView).text = "Heading: ${degree}º"
-        }
-    }
-
-    private fun convertToDMS(coordinate:Double,isLatitude:Boolean):String{
+    private fun convertToDMS(coordinate: Double, isLatitude: Boolean): String {
         val absolute = Math.abs(coordinate)
         val degrees = absolute.toInt()
-        val minutesFull = (absolute-degrees) * 60
+        val minutesFull = (absolute - degrees) * 60
         val minutes = minutesFull.toInt()
-        val seconds = ((minutesFull-minutes) * 60).toInt()
+        val seconds = ((minutesFull - minutes) * 60).toInt()
 
-        val direction = if (isLatitude){
+        val direction = if (isLatitude) {
             if (coordinate >= 0) "N" else "S"
-        } else{
+        } else {
             if (coordinate >= 0) "E" else "W"
         }
         return String.format("%d°%02d'%02d\" %s ", degrees, minutes, seconds, direction)
     }
 
-    private fun updateLocationUI(latitude:Double,longitude:Double){
+    private fun updateLocationUI(latitude: Double, longitude: Double) {
         val locationTextView = findViewById<TextView>(R.id.degreeText)
-        val latitudeDMS = convertToDMS(latitude,true)
-        val longitudeDMS = convertToDMS(longitude,false)
+        val latitudeDMS = convertToDMS(latitude, true)
+        val longitudeDMS = convertToDMS(longitude, false)
         locationTextView.text = "$latitudeDMS $longitudeDMS"
     }
 
-    private fun getCurrentLocation(){
-        currentLocation.fetchLocation(object:CurrentLocation.LocationResultCallback{
+
+    // TODO fetch the item with id = 1 in the database
+    private fun fetchAddressFromDatabase() {
+        val dbAccess = DatabaseAccess.getInstance(this)
+        dbAccess.open()
+
+        // Query the address for id = 1
+        val address = dbAccess.getAddress(1)
+
+        // Log the address
+        Log.d("DatabaseLog", "Address for ID 1: $address")
+
+        dbAccess.close()
+    }
+
+    private fun getCurrentLocation() {
+        currentLocation.fetchLocation(object: CurrentLocation.LocationResultCallback {
             override fun onLocationRetrieved(latitude: Double, longitude: Double) {
-                updateLocationUI(latitude,longitude)
+                updateLocationUI(latitude, longitude)
             }
 
             override fun onError(message: String) {
-                Toast.makeText(this@MainActivity,message,Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
         })
     }
-
-    override fun onAccuracyChanged(sensor: Sensor?,accuracy:Int) {
-
-    }
-
 }
