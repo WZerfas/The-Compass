@@ -44,6 +44,8 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         destinationLat = intent.getDoubleExtra("latitude", 0.0)
         destinationLon = intent.getDoubleExtra("longitude", 0.0)
+        Log.d("NavigationActivity","Received coordinates: " +
+                "latitude=$destinationLat, longitude = $destinationLon")
 
         if (destinationLat != 0.0 && destinationLon != 0.0) {
             initializeSensors()
