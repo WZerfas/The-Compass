@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var arrowView: ImageView
     private lateinit var distanceTextView: TextView
+    private lateinit var destTextView: TextView
     private var destinationLat = Double.NaN
     private var destinationLon = Double.NaN
     private var currentAzimuth = 0f
@@ -47,6 +48,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         arrowView = findViewById(R.id.imageView)
         distanceTextView = findViewById(R.id.distanceTextView)
+        destTextView = findViewById(R.id.destTextView)
 
         // Load destination from SharedPreferences
         loadDestination()
@@ -126,6 +128,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         clearDestination()
         Toast.makeText(this, "Navigation ended.", Toast.LENGTH_SHORT).show()
         distanceTextView.text = "Distance: -- m"
+        destTextView.text = "Navigation Ended."
         arrowView.rotation = 0f
 
         haveSensorData = false
@@ -205,6 +208,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
                     // Update UI
                     distanceTextView.text = "Distance: ${distance.toInt()} m"
+                    destTextView.text = "Navigating to ${destinationLat}º ${destinationLon}"
 
                     if (haveSensorData && haveLocationData) {
                         updateArrow()
@@ -216,6 +220,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
                     }
                 } else {
                     distanceTextView.text = "Distance: -- m"
+                    destTextView.text = "Navigation Not Active"
                     arrowView.rotation = 0f
                 }
             }
