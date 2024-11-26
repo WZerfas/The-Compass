@@ -3,26 +3,29 @@ package com.cs407.the_compass.util
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.Priority
+import com.google.android.gms.location.*
 
+/**
+ * A utility class for fetching the current location.
+ **/
 class CurrentLocation(
     private val activity: Activity,
     private val fusedLocationClient: FusedLocationProviderClient
 ) {
 
-    private lateinit var locationCallback: LocationCallback
+    private var locationCallback: LocationCallback? = null
 
     interface LocationResultCallback {
         fun onLocationRetrieved(latitude: Double, longitude: Double)
         fun onError(message: String)
     }
 
+    /**
+     * Checks for location permissions and attempts to fetch the location.
+     **/
     fun checkPermissionsAndFetchLocation(
         permissionLauncher: ActivityResultLauncher<String>,
         callback: LocationResultCallback
@@ -38,9 +41,9 @@ class CurrentLocation(
                 activity,
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
-            if (!shouldShowRationale) {
-                // Permission denied with 'Don't Ask Again'
-                callback.onError("Location permission denied.\nPlease enable it in app settings.")
+            if (shouldShowRationale) {
+                // Show rationale to the user
+                callback.onError("Location permission is needed to fetch your current location.")
             } else {
                 // Request user permission
                 permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -48,16 +51,25 @@ class CurrentLocation(
         }
     }
 
-
+    /**
+     * Fetches the last known location or requests a new location update.
+     **/
     fun fetchLocation(callback: LocationResultCallback) {
-        if (ActivityCompat.checkSelfPermission(activity,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            callback.onError("Location permission not granted")
+        if (ActivityCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            callback.onError("Location permission not granted.")
             return
         }
+
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null){
-                callback.onLocationRetrieved(location.latitude,location.longitude)
-            }else{
+            if (location != null) {
+                activity.runOnUiThread {
+                    callback.onLocationRetrieved(location.latitude, location.longitude)
+                }
+            } else {
                 requestNewLocation(callback)
             }
         }.addOnFailureListener { exception ->
@@ -65,33 +77,56 @@ class CurrentLocation(
         }
     }
 
+    /**
+     * Requests a new location update if the last known location is unavailable.
+     **/
     private fun requestNewLocation(callback: LocationResultCallback) {
-        val locationRequest = LocationRequest.create().apply {
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-            interval = 10000 // 10 seconds
-            fastestInterval = 5000
-        }
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000L)
+            .setMinUpdateIntervalMillis(5000L)
+            .build()
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                fusedLocationClient.removeLocationUpdates(this)
-                if (locationResult.locations.isNotEmpty()){
+                stopLocationUpdates()
+                if (locationResult.locations.isNotEmpty()) {
                     val location = locationResult.locations.first()
-                    callback.onLocationRetrieved(location.latitude,location.longitude)
-                }else{
-                    callback.onError("Location data not available")
+                    activity.runOnUiThread {
+                        callback.onLocationRetrieved(location.latitude, location.longitude)
+                    }
+                } else {
+                    callback.onError("Unable to retrieve location.")
                 }
             }
         }
 
         try {
-            if (ActivityCompat.checkSelfPermission(activity,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                callback.onError("Location permission not granted")
+            if (ActivityCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                callback.onError("Location permission not granted.")
                 return
             }
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback,activity.mainLooper)
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback!!,
+                activity.mainLooper
+            )
         } catch (e: SecurityException) {
-            callback.onError("Permission denied or location not available")
+            callback.onError("Location permission not granted.")
+        } catch (e: Exception) {
+            callback.onError("An unexpected error occurred: ${e.message}")
         }
+    }
+
+    /**
+     * Stops location updates to prevent memory leaks.
+     **/
+    fun stopLocationUpdates() {
+        locationCallback?.let {
+            fusedLocationClient.removeLocationUpdates(it)
+        }
+        locationCallback = null
     }
 }
