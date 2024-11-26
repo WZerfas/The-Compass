@@ -83,11 +83,11 @@ class MainActivity : AppCompatActivity() {
         compassManager = CompassManager(this){ degree, direction ->
             degreeTextView.text = "${degree.toInt()}º $direction"
             compassImage.rotation = -degree
-
         }
         currentLocation = CurrentLocation(this, fusedLocationProviderClient)
 
         btnMap.setOnClickListener {
+            // Navigate directly to NavigationActivity
             val intent = Intent(this, NavigationActivity::class.java)
             startActivity(intent)
         }
@@ -152,7 +152,6 @@ class MainActivity : AppCompatActivity() {
         val longitudeDMS = convertToDMS(longitude, false)
         locationTextView.text = "$latitudeDMS $longitudeDMS"
     }
-
 
     // TODO fetch the item with id = 1 in the database
     private fun fetchAddressFromDatabase() {

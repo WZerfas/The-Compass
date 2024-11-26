@@ -29,7 +29,6 @@ class SearchActivity : AppCompatActivity() {
         searchModeSwitch.isChecked = searchingCoordinate
         updateMode()
 
-        // Handle switch state changes
         searchModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             searchingCoordinate = isChecked
             updateMode()
@@ -72,7 +71,7 @@ class SearchActivity : AppCompatActivity() {
                 val latitude = coordinates[0].toDouble()
                 val longitude = coordinates[1].toDouble()
 
-                Log.d("SearchActivity","Parsed coordinates: latitude=$latitude,longitude=$longitude")
+                Log.d("SearchActivity","Parsed coordinates: latitude=$latitude, longitude=$longitude")
 
                 // Validate coordinates
                 if (latitude in -90.0..90.0 && longitude in -180.0..180.0) {
@@ -120,6 +119,8 @@ class SearchActivity : AppCompatActivity() {
         val intent = Intent(this, NavigationActivity::class.java)
         intent.putExtra("latitude", latitude)
         intent.putExtra("longitude", longitude)
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
+        finish()
     }
 }

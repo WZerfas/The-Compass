@@ -68,4 +68,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/search_icon" />
 
+    <ImageView
+        android:id="@+id/btnEnd"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/close_icon"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="600dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
