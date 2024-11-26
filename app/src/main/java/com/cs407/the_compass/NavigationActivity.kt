@@ -9,6 +9,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +26,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var gravity: FloatArray? = null
     private var geomagnetic: FloatArray? = null
+    private var previousAngle = 0f
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationListener: LocationListener
@@ -71,12 +73,12 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-            SensorManager.SENSOR_DELAY_GAME
+            SensorManager.SENSOR_DELAY_UI
         )
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-            SensorManager.SENSOR_DELAY_GAME
+            SensorManager.SENSOR_DELAY_UI
         )
     }
 
@@ -130,8 +132,22 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun updateArrow() {
-        val angle = (bearingToDestination - currentAzimuth + 360) % 360
-        arrowView.rotation = angle
+        val targetAngle = (bearingToDestination - currentAzimuth + 360) % 360
+
+        var angleDifference = targetAngle - previousAngle
+        angleDifference = ((angleDifference + 540) % 360) - 180 // We normalize to -180 - 180
+
+        val newAngle = previousAngle + angleDifference
+
+        // Logging
+        Log.d("NavigationActivity", "currentAzimuth: $currentAzimuth")
+        Log.d("NavigationActivity", "bearingToDestination: $bearingToDestination")
+        Log.d("NavigationActivity", "targetAngle: $targetAngle")
+        Log.d("NavigationActivity", "angleDifference: $angleDifference")
+        Log.d("NavigationActivity", "newAngle: $newAngle")
+
+        arrowView.rotation = newAngle
+        previousAngle = newAngle % 360
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -153,8 +169,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
                 // Smoothing factor
                 val smoothFactor = 0.1f
-                currentAzimuth = currentAzimuth + smoothFactor * (normalizedAzimuth - currentAzimuth)
-
+                currentAzimuth = currentAzimuth + smoothFactor * ((normalizedAzimuth - currentAzimuth + 540) % 360 -180)
                 currentAzimuth = (currentAzimuth + 360) % 360
                 updateArrow()
             }

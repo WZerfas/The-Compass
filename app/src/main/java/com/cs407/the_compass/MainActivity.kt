@@ -80,13 +80,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        compassManager = CompassManager(this, compassImage, degreeTextView)
+        compassManager = CompassManager(this){ degree, direction ->
+            degreeTextView.text = "${degree.toInt()}º $direction"
+            compassImage.rotation = -degree
+
+        }
         currentLocation = CurrentLocation(this, fusedLocationProviderClient)
 
         btnMap.setOnClickListener {
             val intent = Intent(this, NavigationActivity::class.java)
             startActivity(intent)
         }
+
         btnSetting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
@@ -110,7 +115,6 @@ class MainActivity : AppCompatActivity() {
         databaseAccess.logTables()
         databaseAccess.close()
         // Fetch the address from the database with id = 1
-        // TODO Call the method
         fetchAddressFromDatabase()
         //databaseAccess.close()
     }

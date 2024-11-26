@@ -6,9 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 
-/**
- * CompassManager handles sensor data to provide compass functionality.
- **/
 class CompassManager(
     private val context: Context,
     private val callback: (degree: Float, direction: String) -> Unit
@@ -23,9 +20,6 @@ class CompassManager(
     private var geomagnetic: FloatArray? = null
     private val handler = Handler(Looper.getMainLooper())
 
-    /**
-     * Starts the compass by registering sensor listeners.
-     **/
     fun start() {
         rotationVectorSensor?.let {
             sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
@@ -39,9 +33,6 @@ class CompassManager(
         }
     }
 
-    /**
-     * Stops the compass by unregistering sensor listeners.
-     **/
     fun stop() {
         sensorManager.unregisterListener(this)
     }
@@ -76,31 +67,25 @@ class CompassManager(
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Handle sensor accuracy changes if necessary
-    }
-
     private fun updateCompass(rawDegree: Float) {
-        val normalizedDegree = normalizeDegree(rawDegree)
-        currentDegree = smoothDegree(normalizedDegree)
+        val normalizedDegree = (rawDegree + 360) % 360
+        val delta = ((normalizedDegree - currentDegree + 540) % 360) - 180
+        currentDegree += delta * 0.1f // Smoothing factor
+        currentDegree = (currentDegree + 360) % 360 // We normalize to 0-360
+
+        val direction = getDirection(currentDegree)
         handler.post {
-            val direction = getDirection(currentDegree)
             callback(currentDegree, direction)
         }
-    }
-
-    private fun normalizeDegree(degree: Float): Float {
-        return (degree + 360) % 360
-    }
-
-    private fun smoothDegree(targetDegree: Float): Float {
-        val delta = ((targetDegree - currentDegree + 540) % 360) - 180
-        return currentDegree + delta * 0.1f // Smoothing factor
     }
 
     private fun getDirection(degree: Float): String {
         val directions = arrayOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")
         val index = ((degree + 22.5f) / 45f).toInt() % 8
         return directions[index]
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Handle sensor accuracy changes if necessary
     }
 }
