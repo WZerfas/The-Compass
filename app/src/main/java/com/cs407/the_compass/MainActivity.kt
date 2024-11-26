@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import android.Manifest
+import android.content.Context
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentLocation: CurrentLocation
     private lateinit var elevationManager: ElevationManager
     private lateinit var altitudeTextView: TextView
-    private lateinit var pressureTextView: TextView
+    //private lateinit var pressureTextView: TextView
     private val fusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
 
     private val permissionLauncher = registerForActivityResult(
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Cancel", null)
             .show()
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +125,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         compassManager.start()
         elevationManager.startListening()
+        updateNavigationIcon()
     }
 
     override fun onPause() {
@@ -151,6 +154,17 @@ class MainActivity : AppCompatActivity() {
         val latitudeDMS = convertToDMS(latitude, true)
         val longitudeDMS = convertToDMS(longitude, false)
         locationTextView.text = "$latitudeDMS $longitudeDMS"
+    }
+
+    private fun updateNavigationIcon(){
+        val prefs = getSharedPreferences("navigation_prefs",Context.MODE_PRIVATE)
+        val navigatioActive = prefs.getBoolean("navigation_active",false)
+        val btnMap = findViewById<ImageView>(R.id.btnMap)
+        if (navigatioActive){
+            btnMap.setImageResource(R.drawable.map_icon_active)
+        }else{
+            btnMap.setImageResource(R.drawable.map_icon)
+        }
     }
 
     // TODO fetch the item with id = 1 in the database

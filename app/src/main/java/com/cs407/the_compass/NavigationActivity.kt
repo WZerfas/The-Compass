@@ -82,10 +82,12 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         Log.d("NavigationActivity","Received coordinates: latitude=$newLat, longitude=$newLon")
 
         if (!newLat.isNaN() && !newLon.isNaN()) {
+
             // Update destination coordinates
             destinationLat = newLat
             destinationLon = newLon
             // Save to SharedPreferences
+            setNavigationActive(true)
             saveDestination(destinationLat, destinationLon)
 
             //Reset data and sensors
@@ -127,6 +129,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
     private fun endNavigation() {
         clearDestination()
+        setNavigationActive(false)
         Toast.makeText(this, "Navigation ended.", Toast.LENGTH_SHORT).show()
         distanceTextView.text = "Distance: -- m"
         destTextView.text = "Navigation Ended."
@@ -134,6 +137,35 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         haveSensorData = false
         haveLocationData = false
+    }
+
+    private fun setNavigationActive(active: Boolean){
+        val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putBoolean("navigation_active",active)
+        editor.apply()
+    }
+
+    private fun convertToDMS(coordinate: Double, isLatitude: Boolean):String{
+        val absolute = Math.abs(coordinate)
+        val degrees = absolute.toInt()
+        val minutesFull = (absolute - degrees) * 60
+        val minutes = minutesFull.toInt()
+        val seconds = ((minutesFull-minutes) * 60).toInt()
+
+        val direction = if (isLatitude){
+            if (coordinate >= 0) "N" else "S"
+        }else{
+            if (coordinate >= 0) "E" else "W"
+        }
+        return String.format("%d°%02d'%02d\" %s ", degrees, minutes, seconds, direction)
+    }
+
+    private fun updateCurrentLocationUI(latitude:Double,longitude:Double){
+        val currentLocationTextView = findViewById<TextView>(R.id.currentLocationText)
+        val latitudeDMS = convertToDMS(latitude,true)
+        val longitudeDMS = convertToDMS(longitude,false)
+        currentLocationTextView.text = "$latitudeDMS $longitudeDMS"
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -144,10 +176,8 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        if (!destinationLat.isNaN()&& !destinationLon.isNaN()){
-            initializeSensors()
-            initializeLocationUpdates()
-        }
+        initializeSensors()
+        initializeLocationUpdates()
     }
 
     override fun onPause() {
@@ -197,6 +227,9 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         locationListener = object : LocationListener {
             override fun onLocationChanged(currentLocation: Location) {
+                // Update the current location UI always
+                updateCurrentLocationUI(currentLocation.latitude, currentLocation.longitude)
+
                 if (!destinationLat.isNaN() && !destinationLon.isNaN()) {
                     val destinationLocation = Location("Destination")
                     destinationLocation.latitude = destinationLat
@@ -209,9 +242,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
                     // Update UI
                     distanceTextView.text = "Distance: ${distance.toInt()} m"
-                    val formatDestLat = String.format("%.6f",destinationLat)
-                    val formatDestLon = String.format("%.6f",destinationLon)
-                    val text = "Navigating to: \n" + "${formatDestLat}º ${formatDestLon}"
+                    val text = "Navigating to:\n${convertToDMS(destinationLat, true)} ${convertToDMS(destinationLon, false)}"
                     destTextView.gravity = Gravity.CENTER
                     destTextView.text = text
 
@@ -229,6 +260,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
                     arrowView.rotation = 0f
                 }
             }
+
 
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
             override fun onProviderEnabled(provider: String) {}
