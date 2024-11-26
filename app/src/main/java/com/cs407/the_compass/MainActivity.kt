@@ -68,15 +68,15 @@ class MainActivity : AppCompatActivity() {
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
 
         altitudeTextView = findViewById(R.id.altitudeText)
-        pressureTextView = findViewById(R.id.pressureText)
+        //pressureTextView = findViewById(R.id.pressureText)
 
         elevationManager = ElevationManager(this) { elevation, pressure ->
             if (elevation != null && pressure != null) {
                 altitudeTextView.text = "Altitude: ${elevation.toInt()} m"
-                pressureTextView.text = "Pressure: ${pressure.toInt()} hPa"
+                //pressureTextView.text = "Pressure: ${pressure.toInt()} hPa"
             } else {
                 altitudeTextView.text = "Altitude unavailable"
-                pressureTextView.text = "Pressure unavailable"
+                //pressureTextView.text = "Pressure unavailable"
             }
         }
 

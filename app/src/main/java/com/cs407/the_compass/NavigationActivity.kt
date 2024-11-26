@@ -10,6 +10,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -46,7 +47,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val btnSearch = findViewById<ImageView>(R.id.btnSearch)
         val btnEnd = findViewById<ImageView>(R.id.btnEnd)
 
-        arrowView = findViewById(R.id.imageView)
+        arrowView = findViewById(R.id.compassView)
         distanceTextView = findViewById(R.id.distanceTextView)
         destTextView = findViewById(R.id.destTextView)
 
@@ -208,7 +209,11 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
                     // Update UI
                     distanceTextView.text = "Distance: ${distance.toInt()} m"
-                    destTextView.text = "Navigating to ${destinationLat}º ${destinationLon}"
+                    val formatDestLat = String.format("%.6f",destinationLat)
+                    val formatDestLon = String.format("%.6f",destinationLon)
+                    val text = "Navigating to: \n" + "${formatDestLat}º ${formatDestLon}"
+                    destTextView.gravity = Gravity.CENTER
+                    destTextView.text = text
 
                     if (haveSensorData && haveLocationData) {
                         updateArrow()
