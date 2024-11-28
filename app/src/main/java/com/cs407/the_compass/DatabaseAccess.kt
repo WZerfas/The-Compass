@@ -80,41 +80,34 @@ class DatabaseAccess private constructor(context: Context) {
         }
     }
 
-    fun getClosestLocations(latitude: Double, longitude: Double, limit: Int = 3): List<Pair<String, Double>> {
-        val results = mutableListOf<Pair<String, Double>>()
-        val query = """
-        SELECT name, 
-               latitude, 
-               longitude, 
-               ( (latitude - ?) * (latitude - ?) + (longitude - ?) * (longitude - ?) ) AS distance 
-        FROM Places
-        ORDER BY distance ASC
-        LIMIT ?
-    """.trimIndent()
-
-        val cursor = db?.rawQuery(query, arrayOf(latitude.toString(), latitude.toString(), longitude.toString(), longitude.toString(), limit.toString()))
-        cursor?.use {
-            while (it.moveToNext()) {
-                val name = it.getString(0)
-                val placeLatitude = it.getDouble(1)
-                val placeLongitude = it.getDouble(2)
-                val distance = calculateDistance(latitude, longitude, placeLatitude, placeLongitude)
-                results.add(name to distance)
+    fun getLocationByName(name: String): Pair<Double, Double>? {
+        val query = "SELECT latitude, longitude FROM Places WHERE name = ?"
+        val cursor = db?.rawQuery(query, arrayOf(name))
+        return cursor?.use {
+            if (it.moveToFirst()) {
+                val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
+                val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
+                Pair(latitude, longitude)
+            } else {
+                null
             }
         }
-        return results
     }
 
-    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val earthRadius = 3958.8 // Radius in miles
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
-        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        return earthRadius * c
+    fun getLocationsByQuery(query: String): List<Pair<String, Pair<Double, Double>>> {
+        val locations = mutableListOf<Pair<String, Pair<Double, Double>>>()
+
+        val sqlQuery = "SELECT name, latitude, longitude FROM Places WHERE name LIKE ? ORDER BY name ASC LIMIT 3"
+        val cursor = db?.rawQuery(sqlQuery, arrayOf("%$query%"))
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val name = it.getString(it.getColumnIndexOrThrow("name"))
+                val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
+                val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
+                locations.add(Pair(name, Pair(latitude, longitude)))
+            }
+        }
+        return locations
     }
-
-
 }
