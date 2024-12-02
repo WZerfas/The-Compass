@@ -8,41 +8,95 @@
     android:fitsSystemWindows="true"
     tools:context=".SettingActivity">
 
-    <!-- Home Icon -->
     <ImageView
-        android:id="@+id/btnHome"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="265dp"
-        android:contentDescription="Home Icon"
-        android:src="@drawable/navigation_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/btnMap"
-        app:layout_constraintEnd_toStartOf="@+id/btnMap"
+        android:id="@+id/BtnReturn_Set"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="28dp"
+        android:contentDescription="Close"
+        android:src="@drawable/close_icon"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnMap" />
-
-    <!-- Map Icon -->
-    <ImageView
-        android:id="@+id/btnMap"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:contentDescription="Map Icon"
-        android:src="@drawable/map_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnHome"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="346dp"
-        android:layout_marginTop="170dp"
+    <TextView
+        android:id="@+id/locationServiceText"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginEnd="27dp"
+        android:layout_marginBottom="63dp"
+        android:text="Set Location Service Intervals"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/receptionAlertText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_preferences" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/receptionAlertText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginEnd="112dp"
+        android:layout_marginBottom="445dp"
+        android:text="Reception Alert"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/setFavorateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginEnd="112dp"
+        android:layout_marginBottom="152dp"
+        android:text="Book Mark Favorate"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/clearLocationLogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="88dp"
+        android:layout_marginBottom="244dp"
+        android:text="Clear Location Log"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/LocationLogText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="76dp"
+        android:layout_marginBottom="344dp"
+        android:text="Location log"
+        android:textColor="#FFFFFF"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/searchModeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="74dp"
+        android:layout_marginBottom="62dp"
+        android:thumbTint="@color/white"
+        android:trackTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/clearLocationLogText"
+        app:layout_constraintStart_toEndOf="@+id/LocationLogText"
+        app:layout_constraintTop_toBottomOf="@+id/receptionAlertText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

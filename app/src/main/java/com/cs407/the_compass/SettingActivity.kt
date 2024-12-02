@@ -13,9 +13,9 @@ import com.cs407.the_compass.util.CompassManager
 class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_settings)
+        setContentView(R.layout.activity_setting)
 
-        val btnHome = findViewById<ImageView>(R.id.closeButton)
+        val btnHome = findViewById<ImageView>(R.id.BtnReturn_Set)
         //val btnMap = findViewById<ImageView>(R.id.btnMap)
 
         btnHome.setOnClickListener {
