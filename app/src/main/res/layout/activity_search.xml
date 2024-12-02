@@ -9,45 +9,58 @@
     tools:context=".SearchActivity">
 
     <!-- Confirm Button -->
+
+    <!-- Return Button -->
+
+    <!-- Coordinate Input Field -->
+
+    <!-- Mode Switch -->
+
     <ImageView
         android:id="@+id/btnConfirmSearch"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginTop="76dp"
+        android:layout_marginEnd="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/search_icon" />
 
-    <!-- Return Button -->
     <ImageView
         android:id="@+id/btnReturn"
-        android:layout_width="0dp"
-        android:layout_height="78dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/searchText"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="76dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
-    <!-- Coordinate Input Field -->
+    <ImageView
+        android:id="@+id/btnFavorite"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="76dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/btn_star" />
+
     <EditText
         android:id="@+id/searchText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="56dp"
         android:layout_marginEnd="16dp"
         android:hint="Enter coordinates (lat,lon)"
         android:inputType="text"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btnReturn"
         app:layout_constraintTop_toBottomOf="@+id/btnConfirmSearch" />
 
-    <!-- Mode Switch -->
     <Switch
         android:id="@+id/searchModeSwitch"
         android:layout_width="wrap_content"
@@ -82,8 +95,8 @@
         android:id="@+id/suggestionsList"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:padding="8dp"
         android:visibility="gone"
