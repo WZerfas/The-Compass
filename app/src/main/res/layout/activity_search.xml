@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,89 +9,81 @@
     android:background="#000000"
     tools:context=".SearchActivity">
 
-    <!-- Confirm Button -->
-
-    <!-- Return Button -->
-
     <!-- Coordinate Input Field -->
-
-    <!-- Mode Switch -->
-
-    <ImageView
-        android:id="@+id/btnConfirmSearch"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="76dp"
-        android:layout_marginEnd="28dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/search_icon" />
-
-    <ImageView
-        android:id="@+id/btnReturn"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="76dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/back_icon" />
-
-    <ImageView
-        android:id="@+id/btnFavorite"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="172dp"
-        android:layout_marginTop="76dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/favorite_icon" />
-
     <EditText
         android:id="@+id/searchText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Enter coordinates (lat,lon)"
         android:inputType="text"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/btnReturn"
-        app:layout_constraintTop_toBottomOf="@+id/btnConfirmSearch" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Switch
-        android:id="@+id/searchModeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="41dp"
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/btnReturn"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="43dp"
-        android:layout_marginBottom="29dp"
-        android:thumbTint="@color/white"
-        android:trackTint="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/searchText"
-        app:layout_constraintEnd_toStartOf="@+id/btnConfirmSearch"
-        app:layout_constraintHorizontal_bias="0.834"
+        app:layout_constraintTop_toBottomOf="@id/searchText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnFavorite"
+        app:srcCompat="@drawable/back_icon" />
+
+    <!-- Favorite Button -->
+    <ImageView
+        android:id="@+id/btnFavorite"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/searchText"
         app:layout_constraintStart_toEndOf="@+id/btnReturn"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintEnd_toStartOf="@+id/btnConfirmSearch"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:srcCompat="@drawable/favorite_icon" />
+
+    <!-- Confirm Search Button -->
+    <ImageView
+        android:id="@+id/btnConfirmSearch"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/searchText"
+        app:layout_constraintStart_toEndOf="@+id/btnFavorite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/search_icon" />
 
     <!-- Mode Text -->
     <TextView
         android:id="@+id/modeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
         android:text="Address Mode"
         android:textColor="@color/white"
-        app:layout_constraintEnd_toStartOf="@+id/searchModeSwitch"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/btnReturn"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Mode Switch -->
+    <Switch
+        android:id="@+id/searchModeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:thumbTint="@color/white"
+        android:trackTint="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/btnFavorite"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Suggestions List -->
     <ListView
         android:id="@+id/suggestionsList"
         android:layout_width="0dp"
@@ -100,9 +93,8 @@
         android:layout_marginEnd="16dp"
         android:padding="8dp"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchText" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

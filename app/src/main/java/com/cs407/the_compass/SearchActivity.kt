@@ -106,8 +106,8 @@ class SearchActivity : AppCompatActivity() {
             modeTextView.text = "Coordinate Mode"
             searchEditText.hint = "Enter coordinates (lat,lon)"
         } else {
-            modeTextView.text = "Address Mode"
-            searchEditText.hint = "Enter address"
+            modeTextView.text = "Search Mode"
+            searchEditText.hint = "Searching for..."
         }
     }
 

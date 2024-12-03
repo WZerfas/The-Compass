@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -53,6 +54,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
         // Load destination from SharedPreferences
         loadDestination()
+        btnEnd.visibility = if (isNavigationActive()) View.VISIBLE else View.GONE
 
         processIntentData(intent)
 
@@ -99,7 +101,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
             initializeLocationUpdates()
         } else if (destinationLat.isNaN() || destinationLon.isNaN()) {
             // No coordinates provided and no stored destination
-            Toast.makeText(this, "No destination selected. Please search for a destination.", Toast.LENGTH_SHORT).show()
+            // Toast.makeText(this, "No destination selected. Please search for a destination.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -144,6 +146,14 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val editor = prefs.edit()
         editor.putBoolean("navigation_active",active)
         editor.apply()
+
+        val btnEnd = findViewById<ImageView>(R.id.btnEnd)
+        btnEnd.visibility = if (active) View.VISIBLE else View.GONE
+    }
+
+    private fun isNavigationActive(): Boolean{
+        val prefs = getSharedPreferences("navigation_prefs",Context.MODE_PRIVATE)
+        return prefs.getBoolean("navigation_active",false)
     }
 
     private fun convertToDMS(coordinate: Double, isLatitude: Boolean):String{

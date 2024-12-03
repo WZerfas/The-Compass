@@ -9,8 +9,8 @@
     a. Implement the background process
         i. Math part for the navigation (buffer, etc.)
     b. A page for past 24 hours (or more) location
-    c. Display Current Location
-    d. Hide the end navigation button when the navigation was not active
+    c. Display Current Location (DONE)
+    d. Hide the end navigation button when the navigation was not active (DONE)
 
 3.Setting
     a. add Metric/Imperial switch
@@ -26,7 +26,7 @@
     d. A button for navigating to home, favorite, etc
 
 5.Database
-    a. Implement a database for the search function (DONE)
+    a. Implement a database for the search function
     b. Implement a database for location tracking (up to 24 hours)
     c. Implement a database for user declared location (home, favorite, etc.)
 
