@@ -34,7 +34,7 @@
         android:layout_marginTop="76dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_revert" />
+        app:srcCompat="@drawable/back_icon" />
 
     <ImageView
         android:id="@+id/btnFavorite"
@@ -44,7 +44,7 @@
         android:layout_marginTop="76dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/btn_star" />
+        app:srcCompat="@drawable/favorite_icon" />
 
     <EditText
         android:id="@+id/searchText"

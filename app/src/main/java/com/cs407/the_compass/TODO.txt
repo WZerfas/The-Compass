@@ -1,31 +1,32 @@
 
 1.Home
-    a. When the navigation is active, change the btnMap to Red
+    a. When the navigation is active, change the btnMap to Red (DONE)
     b. Find a way to ask the user to calibrate their device, by rotating their phone around, etc.
     c. Calibrate the elevation; it is off by 15% or something
-    d. Remove the pressure text
+    d. Remove the pressure text (DONE)
 
 2.Navigation
     a. Implement the background process
         i. Math part for the navigation (buffer, etc.)
     b. A page for past 24 hours (or more) location
     c. Display Current Location
+    d. Hide the end navigation button when the navigation was not active
 
 3.Setting
     a. add Metric/Imperial switch
     b. Implement the reception alert
-    c. Opt in/out for Location Logs
+    c. Opt in/out for Location Logs (DONE)
     d. Clear Location Logs
     e. Add Home/Favorite Location
 
 4.Search
-    a. Add a close button to exit the search
+    a. Add a close button to exit the search (DONE)
     b. Implement Search Results dropdown
     c. Implement a fuzzy search or regex???
     d. A button for navigating to home, favorite, etc
 
 5.Database
-    a. Implement a database for the search function
+    a. Implement a database for the search function (DONE)
     b. Implement a database for location tracking (up to 24 hours)
     c. Implement a database for user declared location (home, favorite, etc.)
 
