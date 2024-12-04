@@ -55,7 +55,7 @@
         android:layout_marginStart="112dp"
         android:layout_marginEnd="112dp"
         android:layout_marginBottom="152dp"
-        android:text="Book Mark Favorate"
+        android:text="Book Mark Favorite"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
         android:clickable="true"

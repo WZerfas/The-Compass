@@ -9,29 +9,39 @@
     android:background="#000000"
     tools:context=".SearchActivity">
 
-    <!-- Coordinate Input Field -->
-    <EditText
-        android:id="@+id/searchText"
-        android:layout_width="0dp"
+    <!-- Mode Text -->
+    <TextView
+        android:id="@+id/modeTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Enter coordinates (lat,lon)"
-        android:inputType="text"
+        android:layout_marginBottom="32dp"
+        android:text="Address Mode"
         android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Mode Switch -->
+    <Switch
+        android:id="@+id/searchModeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="16dp"
+        android:thumbTint="@color/white"
+        android:trackTint="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Back Button -->
     <ImageView
         android:id="@+id/btnReturn"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/searchText"
+        android:layout_marginTop="48dp"
+        app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnFavorite"
         app:srcCompat="@drawable/back_icon" />
@@ -41,8 +51,8 @@
         android:id="@+id/btnFavorite"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/searchText"
+        android:layout_marginTop="48dp"
+        app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toEndOf="@+id/btnReturn"
         app:layout_constraintEnd_toStartOf="@+id/btnConfirmSearch"
         app:layout_constraintHorizontal_bias="0.5"
@@ -53,35 +63,27 @@
         android:id="@+id/btnConfirmSearch"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/searchText"
+        android:layout_marginTop="48dp"
+        app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toEndOf="@+id/btnFavorite"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/search_icon" />
 
-    <!-- Mode Text -->
-    <TextView
-        android:id="@+id/modeTextView"
-        android:layout_width="wrap_content"
+    <!-- Coordinate Input Field -->
+    <EditText
+        android:id="@+id/searchText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginStart="16dp"
-        android:text="Address Mode"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/btnReturn"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Mode Switch -->
-    <Switch
-        android:id="@+id/searchModeSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:thumbTint="@color/white"
-        android:trackTint="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/btnFavorite"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:hint="Enter coordinates (lat,lon)"
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnReturn" />
 
     <!-- Suggestions List -->
     <ListView
