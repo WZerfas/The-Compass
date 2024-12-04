@@ -1,5 +1,6 @@
 package com.cs407.the_compass
 
+import android.content.Context
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
@@ -18,6 +19,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var returnButton: ImageView
     private lateinit var searchModeSwitch: Switch
     private lateinit var modeTextView: TextView
+    private lateinit var favoriteButton: ImageView
 
     private lateinit var suggestionsListView: ListView
 
@@ -32,6 +34,7 @@ class SearchActivity : AppCompatActivity() {
         searchModeSwitch = findViewById(R.id.searchModeSwitch)
         modeTextView = findViewById(R.id.modeTextView)
         suggestionsListView = findViewById(R.id.suggestionsList)
+        favoriteButton = findViewById(R.id.btnFavorite)
 
         searchModeSwitch.isChecked = searchingCoordinate
         updateMode()
@@ -43,6 +46,13 @@ class SearchActivity : AppCompatActivity() {
 
         returnButton.setOnClickListener {
             finish()
+        }
+
+        favoriteButton.setOnClickListener{
+            val sharedPreferenceFavor = getSharedPreferences("StoredFavorite", Context.MODE_PRIVATE)
+            val favoriteLocation = sharedPreferenceFavor.getString("favorite", null)
+            searchEditText.setText(favoriteLocation)
+
         }
 
         confirmButton.setOnClickListener {
