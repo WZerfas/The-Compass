@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         val degreeTextView = findViewById<TextView>(R.id.degreeView)
         val btnMap = findViewById<ImageView>(R.id.btnMap)
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
+        val btnLog = findViewById<ImageView>(R.id.btnLog)
 
         altitudeTextView = findViewById(R.id.altitudeText)
         //pressureTextView = findViewById(R.id.pressureText)
@@ -97,6 +98,16 @@ class MainActivity : AppCompatActivity() {
         btnSetting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)
+        }
+
+        btnLog.setOnClickListener{
+            val sharedPreferenceSet = getSharedPreferences("StoredPreferences", MODE_PRIVATE)
+            val isLocationLogEnabled = sharedPreferenceSet.getBoolean("locationLogEnabled", false)
+            if (isLocationLogEnabled == false){
+                Toast.makeText(this, "Log function not enabled", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(this, "Enter the log (PlaceHolder)", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Check location permission and fetch location

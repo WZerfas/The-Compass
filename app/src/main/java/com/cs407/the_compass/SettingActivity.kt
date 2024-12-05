@@ -29,9 +29,16 @@ class SettingActivity : AppCompatActivity() {
             finish()
         }
 
-        logStatusText.text = if (locationLogSwitch.isChecked) "On" else "Off"
+        // Load the saved state of the switch from SharedPreferences
+        val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+        val isLocationLogEnabled = sharedPreferences.getBoolean("locationLogEnabled", false)
+        locationLogSwitch.isChecked = isLocationLogEnabled
+        logStatusText.text = if (isLocationLogEnabled) "On" else "Off"
+
+        // Save switch state when toggled
         locationLogSwitch.setOnCheckedChangeListener { _, isChecked ->
             logStatusText.text = if (isChecked) "On" else "Off"
+            saveSwitchState(isChecked)
         }
 
         bookMarkFavorateText.setOnClickListener {
@@ -39,12 +46,17 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveSwitchState(isChecked: Boolean) {
+        val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("locationLogEnabled", isChecked)
+        editor.apply()
+    }
+
     private fun showInputDialog() {
-        // Create an EditText to input location name
         val input = EditText(this)
         input.hint = "Enter location name"
 
-        // Build an AlertDialog
         val dialog = AlertDialog.Builder(this)
             .setTitle("Add Favorite")
             .setMessage("Enter the location you want save as favorite")
@@ -52,7 +64,7 @@ class SettingActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val locationName = input.text.toString()
                 if (locationName.isNotEmpty()) {
-                    saveToSharedPreferences(locationName)
+                    saveFavoriteLocation(locationName)
                     Toast.makeText(this, "Location saved: $locationName", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "Location cannot be empty!", Toast.LENGTH_SHORT).show()
@@ -64,11 +76,9 @@ class SettingActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun saveToSharedPreferences(locationName: String) {
-        val sharedPreferences = getSharedPreferences("StoredFavorite", Context.MODE_PRIVATE)
+    private fun saveFavoriteLocation(locationName: String) {
+        val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-
-        // Use a fixed key to save the favorite location
         editor.putString("favorite", locationName)
         editor.apply()
     }
