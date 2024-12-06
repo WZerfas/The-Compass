@@ -43,6 +43,8 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
         val btnHome = findViewById<ImageView>(R.id.btnHome)
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
         val btnSearch = findViewById<ImageView>(R.id.btnSearch)
