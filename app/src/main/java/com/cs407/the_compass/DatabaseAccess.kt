@@ -35,26 +35,6 @@ class DatabaseAccess private constructor(context: Context) {
         db?.close()
     }
 
-    // Query to get the address by passing id
-    /**
-    fun getAddress(id: Int): String {
-        val result = StringBuilder()
-        val query = "SELECT name, longitude, latitude FROM locations WHERE id = ?"
-        val c = db?.rawQuery(query, arrayOf(id.toString()))
-
-        c?.use {
-            while (it.moveToNext()) {
-                val name = it.getString(it.getColumnIndexOrThrow("name"))
-                val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
-                val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
-
-                result.append("Name: $name, Longitude: $longitude, Latitude: $latitude")
-            }
-        }
-        return result.toString()
-    }
-    */
-
     fun getLocationByName(name: String): Pair<Double, Double>? {
         val query = "SELECT latitude, longitude FROM locations WHERE name = ?"
         val cursor = db?.rawQuery(query, arrayOf(name))
