@@ -40,7 +40,7 @@ class DatabaseAccess private constructor(context: Context) {
     fun getAddress(id: Int): String {
         val result = StringBuilder()
         //TODO Change "Places" to (table in locations)
-        val query = "SELECT name, longitude, latitude, region FROM Places WHERE id = ?"
+        val query = "SELECT name, longitude, latitude FROM locations WHERE id = ?"
         val c = db?.rawQuery(query, arrayOf(id.toString()))
 
         c?.use {
@@ -48,9 +48,8 @@ class DatabaseAccess private constructor(context: Context) {
                 val name = it.getString(it.getColumnIndexOrThrow("name"))
                 val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
                 val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
-                val region = it.getString(it.getColumnIndexOrThrow("region"))
 
-                result.append("Name: $name, Longitude: $longitude, Latitude: $latitude, Region: $region")
+                result.append("Name: $name, Longitude: $longitude, Latitude: $latitude")
             }
         }
 
@@ -84,7 +83,7 @@ class DatabaseAccess private constructor(context: Context) {
 
     fun getLocationByName(name: String): Pair<Double, Double>? {
         //TODO Change Places
-        val query = "SELECT latitude, longitude FROM Places WHERE name = ?"
+        val query = "SELECT latitude, longitude FROM locations WHERE name = ?"
         val cursor = db?.rawQuery(query, arrayOf(name))
         return cursor?.use {
             if (it.moveToFirst()) {
@@ -106,7 +105,7 @@ class DatabaseAccess private constructor(context: Context) {
         SELECT name, latitude, longitude, 
         ((latitude - $referenceLat) * (latitude - $referenceLat) + 
         (longitude - $referenceLon) * (longitude - $referenceLon)) AS distance 
-        FROM Places 
+        FROM locations 
         WHERE name LIKE ? 
         ORDER BY distance ASC 
         LIMIT 3
