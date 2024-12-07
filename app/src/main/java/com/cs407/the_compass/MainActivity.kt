@@ -123,14 +123,6 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize the database access
         val databaseAccess = DatabaseAccess.getInstance(this)
-
-        // Open the database and log tables
-        databaseAccess.open()
-        databaseAccess.logTables()
-        databaseAccess.close()
-        // Fetch the address from the database with id = 1
-        fetchAddressFromDatabase()
-        //databaseAccess.close()
     }
 
     override fun onResume() {
@@ -177,20 +169,6 @@ class MainActivity : AppCompatActivity() {
         }else{
             btnMap.setImageResource(R.drawable.map_icon)
         }
-    }
-
-    // TODO fetch the item with id = 1 in the database
-    private fun fetchAddressFromDatabase() {
-        val dbAccess = DatabaseAccess.getInstance(this)
-        dbAccess.open()
-
-        // Query the address for id = 1
-        val address = dbAccess.getAddress(1)
-
-        // Log the address
-        Log.d("DatabaseLog", "Address for ID 1: $address")
-
-        dbAccess.close()
     }
 
     private fun getCurrentLocation() {
