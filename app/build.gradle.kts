@@ -11,8 +11,8 @@ android {
         applicationId = "com.cs407.the_compass"
         minSdk = 24
         targetSdk = 34
-        versionCode = 17
-        versionName = "1.6.1"
+        versionCode = 18
+        versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -23,7 +23,6 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var suggestionsListView: ListView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -52,11 +51,10 @@ class SearchActivity : AppCompatActivity() {
             val sharedPreferenceFavor = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
             val favoriteLocation = sharedPreferenceFavor.getString("favorite", null)
             if (favoriteLocation == null){
-                Toast.makeText(this, "You haven't add favorite location yet", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You haven't added a favorite location yet", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             searchEditText.setText(favoriteLocation)
-
         }
 
         confirmButton.setOnClickListener {
@@ -89,14 +87,12 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-
     }
 
     private fun displaySuggestions(query: String) {
         val databaseAccess = DatabaseAccess.getInstance(this)
         databaseAccess.open()
-        val matchingLocations = databaseAccess.getLocationsByQuery(query) // Implement this in your database logic
+        val matchingLocations = databaseAccess.getLocationsByQuery(query) // Should return List<Pair<String, Pair<Double, Double>>>
         databaseAccess.close()
 
         if (matchingLocations.isEmpty()) {
@@ -110,10 +106,16 @@ class SearchActivity : AppCompatActivity() {
                 val selectedLocation = matchingLocations[position]
                 searchEditText.setText(selectedLocation.first) // Fill selected location
                 suggestionsListView.visibility = View.GONE
+
+                // Corrected navigateToDestination call
+                navigateToDestination(
+                    selectedLocation.second.first,  // Latitude
+                    selectedLocation.second.second, // Longitude
+                    selectedLocation.first          // Destination Name
+                )
             }
         }
     }
-
 
     private fun updateMode() {
         if (searchingCoordinate) {
@@ -136,7 +138,7 @@ class SearchActivity : AppCompatActivity() {
 
                 // Validate coordinates
                 if (latitude in -90.0..90.0 && longitude in -180.0..180.0) {
-                    // Pass the coordinates to NavigationActivity
+                    // No destination name available in coordinate mode
                     navigateToDestination(latitude, longitude)
                 } else {
                     Toast.makeText(this, "Invalid coordinates!", Toast.LENGTH_SHORT).show()
@@ -166,7 +168,7 @@ class SearchActivity : AppCompatActivity() {
         if (locationDetails != null) {
             // Name exists in the database
             val (latitude, longitude) = locationDetails
-            navigateToDestination(latitude, longitude)
+            navigateToDestination(latitude, longitude, address)
         } else {
             // Fallback to Geocoder if name is not found in the database
             val geocoder = Geocoder(this, Locale.getDefault())
@@ -176,7 +178,7 @@ class SearchActivity : AppCompatActivity() {
                     val location = addresses[0]
                     val latitude = location.latitude
                     val longitude = location.longitude
-                    navigateToDestination(latitude, longitude)
+                    navigateToDestination(latitude, longitude, address)
                 } else {
                     Toast.makeText(this, "Cannot get address!", Toast.LENGTH_SHORT).show()
                 }
@@ -186,13 +188,16 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun navigateToDestination(latitude: Double, longitude: Double) {
-        Log.d("SearchActivity","Navigation to destination: latitude=$latitude, longitude=$longitude")
-        val intent = Intent(this, NavigationActivity::class.java)
-        intent.putExtra("latitude", latitude)
-        intent.putExtra("longitude", longitude)
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    private fun navigateToDestination(latitude: Double, longitude: Double, destinationName: String? = null) {
+        Log.d("SearchActivity","Navigation to destination: latitude=$latitude, longitude=$longitude, name=$destinationName")
+        val intent = Intent(this, NavigationActivity::class.java).apply {
+            putExtra("latitude", latitude)
+            putExtra("longitude", longitude)
+            destinationName?.let {
+                putExtra("destination_name", it)
+            }
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         startActivity(intent)
         finish()
     }
