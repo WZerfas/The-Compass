@@ -59,7 +59,7 @@ class ElevationManager(
         if (event.sensor?.type == Sensor.TYPE_PRESSURE) {
             val pressure = event.values[0]
             val altitude = SensorManager.getAltitude(seaLevelPressure, pressure)
-            Log.d("ElevationManager", "Pressure: $pressure hPa, Altitude: $altitude m")
+            //Log.d("ElevationManager", "Pressure: $pressure hPa, Altitude: $altitude m")
             // Ensure callback is called on the main thread
             Handler(Looper.getMainLooper()).post {
                 callback(altitude, pressure)

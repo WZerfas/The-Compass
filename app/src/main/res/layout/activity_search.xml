@@ -38,8 +38,8 @@
     <!-- Back Button -->
     <ImageView
         android:id="@+id/btnReturn"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="48dp"
         app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,8 +49,8 @@
     <!-- Favorite Button -->
     <ImageView
         android:id="@+id/btnFavorite"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="48dp"
         app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toEndOf="@+id/btnReturn"
@@ -61,8 +61,8 @@
     <!-- Confirm Search Button -->
     <ImageView
         android:id="@+id/btnConfirmSearch"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="48dp"
         app:layout_constraintTop_toBottomOf="@id/modeTextView"
         app:layout_constraintStart_toEndOf="@+id/btnFavorite"

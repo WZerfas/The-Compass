@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -13,7 +14,8 @@
         android:id="@+id/btnHome"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_margin="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="Home Icon"
         android:src="@drawable/navigation_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,14 +24,41 @@
     <!-- Settings Icon -->
     <ImageView
         android:id="@+id/btnSetting"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:contentDescription="Setting Icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="20dp"
+        android:contentDescription="Settings Icon"
         android:src="@drawable/setting_icon_v2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Search Icon with Horizontal Chain -->
+    <ImageView
+        android:id="@+id/btnSearch"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:contentDescription="Search Icon"
+        android:src="@drawable/search_icon"
+        app:layout_constraintStart_toEndOf="@+id/btnHome"
+        app:layout_constraintEnd_toStartOf="@+id/btnSetting"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread" />
+
+    <!-- Compass View -->
+    <ImageView
+        android:id="@+id/compassView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="80dp"
+        android:rotation="0"
+        app:layout_constraintTop_toBottomOf="@+id/destTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/arrow_v2"/>
+
+    <!-- Distance TextView -->
     <TextView
         android:id="@+id/distanceTextView"
         android:layout_width="wrap_content"
@@ -42,6 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Current Location TextView -->
     <TextView
         android:id="@+id/currentLocationText"
         android:layout_width="wrap_content"
@@ -55,6 +85,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Destination TextView -->
     <TextView
         android:id="@+id/destTextView"
         android:layout_width="wrap_content"
@@ -67,41 +98,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ImageView
-        android:id="@+id/compassView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="80dp"
-        android:rotation="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        app:srcCompat="@drawable/arrow_v2"/>
-
-    <ImageView
-        android:id="@+id/btnSearch"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="110dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="111dp"
-        app:layout_constraintEnd_toStartOf="@+id/btnSetting"
-        app:layout_constraintStart_toEndOf="@+id/btnHome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/search_icon" />
-
+    <!-- End Navigation Icon at Bottom-Right -->
     <ImageView
         android:id="@+id/btnEnd"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        app:srcCompat="@drawable/end_nav_icon"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="650dp"
-        android:layout_marginEnd="20dp"
+        android:layout_margin="20dp"
+        android:contentDescription="End Navigation Icon"
+        android:src="@drawable/end_nav_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

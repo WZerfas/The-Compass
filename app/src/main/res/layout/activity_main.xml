@@ -22,8 +22,8 @@
     <!-- Settings Icon -->
     <ImageView
         android:id="@+id/btnSetting"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_margin="20dp"
         android:contentDescription="Settings Icon"
         android:src="@drawable/setting_icon_v2"
@@ -34,14 +34,14 @@
 
     <ImageView
         android:id="@+id/btnLog"
-        android:layout_width="66dp"
-        android:layout_height="71dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_margin="20dp"
         android:layout_marginStart="175dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="91dp"
-        android:contentDescription="Settings Icon"
-        android:src="@android:drawable/ic_menu_recent_history"
+        android:contentDescription="Log Icon"
+        android:src="@drawable/history_icon"
         app:layout_constraintEnd_toStartOf="@+id/btnSetting"
         app:layout_constraintStart_toEndOf="@+id/btnMap"
         app:layout_constraintTop_toTopOf="parent" />

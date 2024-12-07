@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.location.Location
 import android.util.Log
 
 class DatabaseAccess private constructor(context: Context) {
@@ -38,6 +39,7 @@ class DatabaseAccess private constructor(context: Context) {
     // Query to get the address by passing id
     fun getAddress(id: Int): String {
         val result = StringBuilder()
+        //TODO Change "Places" to (table in locations)
         val query = "SELECT name, longitude, latitude, region FROM Places WHERE id = ?"
         val c = db?.rawQuery(query, arrayOf(id.toString()))
 
@@ -81,6 +83,7 @@ class DatabaseAccess private constructor(context: Context) {
     }
 
     fun getLocationByName(name: String): Pair<Double, Double>? {
+        //TODO Change Places
         val query = "SELECT latitude, longitude FROM Places WHERE name = ?"
         val cursor = db?.rawQuery(query, arrayOf(name))
         return cursor?.use {
@@ -94,10 +97,21 @@ class DatabaseAccess private constructor(context: Context) {
         }
     }
 
-    fun getLocationsByQuery(query: String): List<Pair<String, Pair<Double, Double>>> {
-        val locations = mutableListOf<Pair<String, Pair<Double, Double>>>()
 
-        val sqlQuery = "SELECT name, latitude, longitude FROM Places WHERE name LIKE ? ORDER BY name ASC LIMIT 3"
+    fun getLocationsByQuery(query: String, referenceLat: Double, referenceLon: Double): List<Pair<String, Triple<Double, Double, Double>>> {
+        val locations = mutableListOf<Pair<String, Triple<Double, Double, Double>>>()
+
+
+        val sqlQuery = """
+        SELECT name, latitude, longitude, 
+        ((latitude - $referenceLat) * (latitude - $referenceLat) + 
+        (longitude - $referenceLon) * (longitude - $referenceLon)) AS distance 
+        FROM Places 
+        WHERE name LIKE ? 
+        ORDER BY distance ASC 
+        LIMIT 3
+    """.trimIndent()
+
         val cursor = db?.rawQuery(sqlQuery, arrayOf("%$query%"))
 
         cursor?.use {
@@ -105,9 +119,59 @@ class DatabaseAccess private constructor(context: Context) {
                 val name = it.getString(it.getColumnIndexOrThrow("name"))
                 val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
                 val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
-                locations.add(Pair(name, Pair(latitude, longitude)))
+
+                // Calculate Haversine distance in kilometers
+                val distance = haversine(referenceLat, referenceLon, latitude, longitude)
+
+                // Store name, latitude, longitude, and distance in the list
+                locations.add(Pair(name, Triple(latitude, longitude, distance)))
             }
         }
         return locations
+    }
+
+    /**
+    fun getLocationsByQuery(query: String, referenceLat: Double, referenceLon: Double): List<Pair<String, Triple<Double, Double, Double>>> {
+        val locations = mutableListOf<Pair<String, Triple<Double, Double, Double>>>()
+
+        // TODO Change places
+        val sqlQuery = """
+        SELECT name, latitude, longitude, 
+        ((latitude - $referenceLat) * (latitude - $referenceLat) + 
+        (longitude - $referenceLon) * (longitude - $referenceLon)) AS distance 
+        FROM Places 
+        WHERE name LIKE ? 
+        ORDER BY distance ASC 
+        LIMIT 3
+    """.trimIndent()
+
+        val cursor = db?.rawQuery(sqlQuery, arrayOf("%$query%"))
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val name = it.getString(it.getColumnIndexOrThrow("name"))
+                val latitude = it.getDouble(it.getColumnIndexOrThrow("latitude"))
+                val longitude = it.getDouble(it.getColumnIndexOrThrow("longitude"))
+                val distance = it.getDouble(it.getColumnIndexOrThrow("distance"))
+
+                // Add destination name, latitude, longitude, and distance to the list
+                locations.add(Pair(name, Triple(latitude, longitude, distance)))
+            }
+        }
+        return locations
+    }
+    */
+
+    private val EARTH_RADIUS_KM = 6371.0
+
+    fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        return EARTH_RADIUS_KM * c
     }
 }

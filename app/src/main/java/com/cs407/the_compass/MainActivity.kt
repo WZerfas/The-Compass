@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import com.cs407.the_compass.util.CompassManager
 import com.cs407.the_compass.util.CurrentLocation
 import com.cs407.the_compass.util.ElevationManager
+import com.cs407.the_compass.util.NotificationUtils
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {

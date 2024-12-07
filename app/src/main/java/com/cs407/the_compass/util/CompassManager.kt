@@ -86,6 +86,5 @@ class CompassManager(
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Handle sensor accuracy changes if necessary
     }
 }

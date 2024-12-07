@@ -1,16 +1,13 @@
 package com.cs407.the_compass
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.hardware.*
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,26 +15,27 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
-class NavigationActivity : AppCompatActivity(), SensorEventListener {
+class NavigationActivity : AppCompatActivity() {
     private lateinit var arrowView: ImageView
     private lateinit var distanceTextView: TextView
     private lateinit var destTextView: TextView
+    private lateinit var currentLocationText: TextView
+    private lateinit var navigationUpdateReceiver: BroadcastReceiver
+
     private var destinationLat = Double.NaN
     private var destinationLon = Double.NaN
+    private var destinationName: String? = null
+
     private var currentAzimuth = 0f
     private var bearingToDestination = 0f
-    private lateinit var sensorManager: SensorManager
-    private var gravity: FloatArray? = null
-    private var geomagnetic: FloatArray? = null
-    private var previousAngle = 0f
+    private var arrowAngle = 0f
     private val arrivalBuffer = 10 // in meters
+    private var hasValidLocation = false
 
-    private lateinit var locationManager: LocationManager
-    private lateinit var locationListener: LocationListener
-
-    private var haveSensorData = false
-    private var haveLocationData = false
+    // Flag to ensure we only check arrival after receiving valid updates
+    private var hasReceivedInitialUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +49,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         arrowView = findViewById(R.id.compassView)
         distanceTextView = findViewById(R.id.distanceTextView)
         destTextView = findViewById(R.id.destTextView)
+        currentLocationText = findViewById(R.id.currentLocationText)
 
         // Load destination from SharedPreferences
         loadDestination()
@@ -76,40 +75,130 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         btnEnd.setOnClickListener {
             endNavigation()
         }
+
+        navigationUpdateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == "com.cs407.the_compass.UPDATE_NAVIGATION") {
+                    val distance = intent.getFloatExtra("distance", 0f)
+                    val direction = intent.getStringExtra("direction") ?: "--"
+                    val destinationNameExtra = intent.getStringExtra("destinationName") ?: "Unknown Location"
+                    bearingToDestination = intent.getFloatExtra("bearingToDestination", 0f)
+                    currentAzimuth = intent.getFloatExtra("currentAzimuth", 0f)
+
+                    val currentLat = intent.getDoubleExtra("currentLat", Double.NaN)
+                    val currentLon = intent.getDoubleExtra("currentLon", Double.NaN)
+
+                    distanceTextView.text = "Distance: ${distance.toInt()} m"
+                    destTextView.text = "Navigating to: $destinationNameExtra"
+
+                    // Convert to DMS if valid
+                    if (!currentLat.isNaN() && !currentLon.isNaN()) {
+                        val latDMS = convertToDMS(currentLat, true)
+                        val lonDMS = convertToDMS(currentLon, false)
+                        currentLocationText.text = "Current Location: $latDMS, $lonDMS"
+                        hasValidLocation = true
+                    } else {
+                        if (!hasValidLocation) {
+                            currentLocationText.text = "Fetching location..."
+                        }
+                    }
+
+                    // Compute arrow angle and rotation smoothing factor
+                    arrowAngle = (bearingToDestination - currentAzimuth + 360) % 360
+                    rotateArrowSmoothly(arrowAngle)
+
+                    if (distance > 0) {
+                        hasReceivedInitialUpdate = true
+                    }
+
+                    if (hasReceivedInitialUpdate && distance <= arrivalBuffer) {
+                        arrivedAtDestination()
+                    }
+                }
+            }
+        }
+    }
+
+    // Conversion function
+    private fun convertToDMS(coordinate: Double, isLatitude: Boolean): String {
+        val absolute = Math.abs(coordinate)
+        val degrees = absolute.toInt()
+        val minutesFull = (absolute - degrees) * 60
+        val minutes = minutesFull.toInt()
+        val seconds = ((minutesFull - minutes) * 60).toInt()
+
+        val direction = if (isLatitude) {
+            if (coordinate >= 0) "N" else "S"
+        } else {
+            if (coordinate >= 0) "E" else "W"
+        }
+
+        return String.format("%d°%02d'%02d\"%s", degrees, minutes, seconds, direction)
+    }
+
+    private fun rotateArrowSmoothly(angle: Float) {
+
+        val currentRotation = arrowView.rotation % 360
+        val delta = ((angle - currentRotation + 540) % 360) - 180
+
+
+        val smoothingFactor = 0.1f
+        val newAngle = currentRotation + delta * smoothingFactor
+
+        arrowView.animate().rotation(newAngle).setDuration(100).start()
     }
 
     private fun processIntentData(intent: Intent) {
         val newLat = intent.getDoubleExtra("latitude", Double.NaN)
         val newLon = intent.getDoubleExtra("longitude", Double.NaN)
-        Log.d("NavigationActivity","Received coordinates: latitude=$newLat, longitude=$newLon")
+        val name = intent.getStringExtra("destination_name")
+
+        Log.d("NavigationActivity", "Received coordinates: latitude=$newLat, longitude=$newLon, name=$name")
 
         if (!newLat.isNaN() && !newLon.isNaN()) {
-
-            // Update destination coordinates
+            // Update coordinates and activate navigation
             destinationLat = newLat
             destinationLon = newLon
-            // Save to SharedPreferences
-            setNavigationActive(true)
-            saveDestination(destinationLat, destinationLon)
+            destinationName = name
+            saveDestination(destinationLat, destinationLon, destinationName)
 
-            //Reset data and sensors
-            haveSensorData = false
-            haveLocationData = false
-
-            //Restart sensors and location updates
-            initializeSensors()
-            initializeLocationUpdates()
-        } else if (destinationLat.isNaN() || destinationLon.isNaN()) {
-            // No coordinates provided and no stored destination
-            // Toast.makeText(this, "No destination selected. Please search for a destination.", Toast.LENGTH_SHORT).show()
+            // Check permissions before starting navigation
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                startNavigationProcess(destinationName)
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    2001
+                )
+            }
+        } else {
+            // No valid destination
+            Log.d("NavigationActivity", "No valid destination provided. Navigation not active.")
         }
     }
 
-    private fun saveDestination(lat: Double, lon: Double) {
+    private fun startNavigationProcess(name: String?) {
+        if (!destinationLat.isNaN() && !destinationLon.isNaN()) {
+            Log.d("NavigationActivity", "Starting navigation with coords: $destinationLat, $destinationLon")
+            setNavigationActive(true)
+        } else {
+            Log.e("NavigationActivity", "Cannot start navigation due to invalid coordinates.")
+        }
+    }
+
+    private fun saveDestination(lat: Double, lon: Double, name: String?) {
         val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.putFloat("dest_lat", lat.toFloat())
         editor.putFloat("dest_lon", lon.toFloat())
+        name?.let {
+            editor.putString("destination_name", it)
+        }
         editor.apply()
     }
 
@@ -117,6 +206,7 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
         destinationLat = prefs.getFloat("dest_lat", Float.NaN).toDouble()
         destinationLon = prefs.getFloat("dest_lon", Float.NaN).toDouble()
+        destinationName = prefs.getString("destination_name", null)
     }
 
     private fun clearDestination() {
@@ -124,9 +214,11 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         val editor = prefs.edit()
         editor.remove("dest_lat")
         editor.remove("dest_lon")
+        editor.remove("destination_name")
         editor.apply()
         destinationLat = Double.NaN
         destinationLon = Double.NaN
+        destinationName = null
     }
 
     private fun endNavigation() {
@@ -135,47 +227,32 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         Toast.makeText(this, "Navigation ended.", Toast.LENGTH_SHORT).show()
         distanceTextView.text = "Distance: -- m"
         destTextView.text = "Navigation Ended."
+        currentLocationText.text = "Fetching location..."
         arrowView.rotation = 0f
-
-        haveSensorData = false
-        haveLocationData = false
+        hasReceivedInitialUpdate = false
     }
 
-    private fun setNavigationActive(active: Boolean){
+    private fun setNavigationActive(active: Boolean) {
         val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
-        editor.putBoolean("navigation_active",active)
+        editor.putBoolean("navigation_active", active)
         editor.apply()
 
         val btnEnd = findViewById<ImageView>(R.id.btnEnd)
         btnEnd.visibility = if (active) View.VISIBLE else View.GONE
-    }
 
-    private fun isNavigationActive(): Boolean{
-        val prefs = getSharedPreferences("navigation_prefs",Context.MODE_PRIVATE)
-        return prefs.getBoolean("navigation_active",false)
-    }
-
-    private fun convertToDMS(coordinate: Double, isLatitude: Boolean):String{
-        val absolute = Math.abs(coordinate)
-        val degrees = absolute.toInt()
-        val minutesFull = (absolute - degrees) * 60
-        val minutes = minutesFull.toInt()
-        val seconds = ((minutesFull-minutes) * 60).toInt()
-
-        val direction = if (isLatitude){
-            if (coordinate >= 0) "N" else "S"
-        }else{
-            if (coordinate >= 0) "E" else "W"
+        if (active) {
+            // Start the navigation service
+            startNavigationService()
+        } else {
+            // Stop the navigation service
+            stopNavigationService()
         }
-        return String.format("%d°%02d'%02d\" %s ", degrees, minutes, seconds, direction)
     }
 
-    private fun updateCurrentLocationUI(latitude:Double,longitude:Double){
-        val currentLocationTextView = findViewById<TextView>(R.id.currentLocationText)
-        val latitudeDMS = convertToDMS(latitude,true)
-        val longitudeDMS = convertToDMS(longitude,false)
-        currentLocationTextView.text = "$latitudeDMS $longitudeDMS"
+    private fun isNavigationActive(): Boolean {
+        val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
+        return prefs.getBoolean("navigation_active", false)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -186,173 +263,55 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        initializeSensors()
-        initializeLocationUpdates()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            navigationUpdateReceiver,
+            IntentFilter("com.cs407.the_compass.UPDATE_NAVIGATION")
+        )
     }
 
     override fun onPause() {
         super.onPause()
-        sensorManager.unregisterListener(this)
-        if (::locationManager.isInitialized && ::locationListener.isInitialized) {
-            locationManager.removeUpdates(locationListener)
-        }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(navigationUpdateReceiver)
     }
 
-    private fun initializeSensors() {
-        if (!::sensorManager.isInitialized) {
-            sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        }
-        sensorManager.unregisterListener(this)
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-            SensorManager.SENSOR_DELAY_UI
-        )
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-            SensorManager.SENSOR_DELAY_UI
-        )
-    }
-
-    private fun initializeLocationUpdates() {
-        if (!::locationManager.isInitialized) {
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        }
-
-        // Check for location permission
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Request permissions if not granted
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1001
-            )
-            return
-        }
-
-        locationListener = object : LocationListener {
-            override fun onLocationChanged(currentLocation: Location) {
-                // Update the current location UI always
-                updateCurrentLocationUI(currentLocation.latitude, currentLocation.longitude)
-
-                if (!destinationLat.isNaN() && !destinationLon.isNaN()) {
-                    val destinationLocation = Location("Destination")
-                    destinationLocation.latitude = destinationLat
-                    destinationLocation.longitude = destinationLon
-
-                    val distance = currentLocation.distanceTo(destinationLocation) // in meters
-                    bearingToDestination = currentLocation.bearingTo(destinationLocation) // in degrees
-
-                    haveLocationData = true
-
-                    // Update UI
-                    distanceTextView.text = "Distance: ${distance.toInt()} m"
-                    val text = "Navigating to:\n${convertToDMS(destinationLat, true)} ${convertToDMS(destinationLon, false)}"
-                    destTextView.gravity = Gravity.CENTER
-                    destTextView.text = text
-
-                    if (haveSensorData && haveLocationData) {
-                        updateArrow()
-                    }
-
-                    // Check if the user has arrived
-                    if (distance <= arrivalBuffer){
-                        arrivedAtDestination()
-                    }
-                } else {
-                    distanceTextView.text = "Distance: -- m"
-                    destTextView.text = "Navigation Not Active"
-                    arrowView.rotation = 0f
-                }
-            }
-
-
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-            override fun onProviderEnabled(provider: String) {}
-            override fun onProviderDisabled(provider: String) {}
-        }
-
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000,
-            1f,   // Minimum distance in meters
-            locationListener
-        )
-
-        // Get last known location
-        val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        if (lastKnownLocation != null) {
-            locationListener.onLocationChanged(lastKnownLocation)
-        }
-    }
-
-    private fun updateArrow() {
-        val targetAngle = (bearingToDestination - currentAzimuth + 360) % 360
-
-        var angleDifference = targetAngle - previousAngle
-        angleDifference = ((angleDifference + 540) % 360) - 180 // Normalize to -180 to 180
-
-        val newAngle = previousAngle + angleDifference
-
-        // Logging
-        Log.d("NavigationActivity", "currentAzimuth: $currentAzimuth")
-        Log.d("NavigationActivity", "bearingToDestination: $bearingToDestination")
-        Log.d("NavigationActivity", "targetAngle: $targetAngle")
-        Log.d("NavigationActivity", "angleDifference: $angleDifference")
-        Log.d("NavigationActivity", "newAngle: $newAngle")
-
-        arrowView.rotation = newAngle
-        previousAngle = newAngle % 360
-    }
-
-    private fun arrivedAtDestination(){
+    private fun arrivedAtDestination() {
         endNavigation()
 
         AlertDialog.Builder(this)
             .setTitle("Arrived at Destination")
             .setMessage("You have arrived at your destination")
-            .setPositiveButton("OK"){dialog,_ ->
+            .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
             }
             .show()
     }
 
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (event == null) return
-        when (event.sensor.type) {
-            Sensor.TYPE_ACCELEROMETER -> gravity = event.values.clone()
-            Sensor.TYPE_MAGNETIC_FIELD -> geomagnetic = event.values.clone()
+    private fun startNavigationService() {
+        val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
+        val destinationName = prefs.getString("destination_name", null)
+
+        val intent = Intent(this, NavigationService::class.java).apply {
+            putExtra("destination_lat", destinationLat)
+            putExtra("destination_lon", destinationLon)
+            destinationName?.let {
+                putExtra("destination_name", it)
+            }
         }
 
-        if (gravity != null && geomagnetic != null) {
-            val R = FloatArray(9)
-            val I = FloatArray(9)
-            if (SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)) {
-                val orientation = FloatArray(3)
-                SensorManager.getOrientation(R, orientation)
-                val azimuthInRadians = orientation[0]
-                val newAzimuth = Math.toDegrees(azimuthInRadians.toDouble()).toFloat()
-                val normalizedAzimuth = (newAzimuth + 360) % 360
-
-                // Smoothing factor
-                val smoothFactor = 0.1f
-                currentAzimuth = currentAzimuth + smoothFactor * ((normalizedAzimuth - currentAzimuth + 540) % 360 -180)
-                currentAzimuth = (currentAzimuth + 360) % 360
-
-                haveSensorData = true
-                if (haveSensorData && haveLocationData) {
-                    updateArrow()
-                }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
             }
+        } else {
+            Toast.makeText(this, "Location permission not granted. Cannot start navigation service.", Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    private fun stopNavigationService() {
+        val intent = Intent(this, NavigationService::class.java)
+        stopService(intent)
     }
 
     override fun onRequestPermissionsResult(
@@ -361,13 +320,11 @@ class NavigationActivity : AppCompatActivity(), SensorEventListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1001) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                // Permission was granted, initialize location updates
-                initializeLocationUpdates()
+        if (requestCode == 2001) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startNavigationProcess(destinationName)
             } else {
-                // Permission denied, show a message to the user
-                Toast.makeText(this, "Permission denied. Unable to get location.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Location permission denied. Cannot start navigation.", Toast.LENGTH_SHORT).show()
             }
         }
     }
