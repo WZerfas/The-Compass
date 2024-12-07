@@ -2,6 +2,7 @@ package com.cs407.the_compass
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
 import android.text.Editable
@@ -105,7 +106,7 @@ class SearchActivity : AppCompatActivity() {
             suggestionsListView.visibility = View.VISIBLE
             val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, matchingLocations.map { it.first })
             suggestionsListView.adapter = adapter
-
+            suggestionsListView.setBackgroundColor(Color.WHITE)
             suggestionsListView.setOnItemClickListener { _, _, position, _ ->
                 val selectedLocation = matchingLocations[position]
                 searchEditText.setText(selectedLocation.first) // Fill selected location
