@@ -9,6 +9,7 @@
     tools:context=".MainActivity"
     android:background="#000000">
 
+    <!-- Map Icon -->
     <ImageView
         android:id="@+id/btnMap"
         android:layout_width="60dp"
@@ -30,58 +31,54 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Compass Needle -->
-
+    <!-- Log Icon -->
     <ImageView
         android:id="@+id/btnLog"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="20dp"
-        android:layout_marginStart="175dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="91dp"
         android:contentDescription="Log Icon"
         android:src="@drawable/history_icon"
         app:layout_constraintEnd_toStartOf="@+id/btnSetting"
         app:layout_constraintStart_toEndOf="@+id/btnMap"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-
+    <!-- Compass Needle Background (Centered) -->
     <ImageView
         android:id="@+id/compassNeedleBackground"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="50dp"
         android:contentDescription="Compass Needle Background"
         app:srcCompat="@drawable/compass_icon_v2_direction"
-        app:layout_constraintTop_toBottomOf="@+id/btnMap"
-        app:layout_constraintBottom_toTopOf="@+id/degreeText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Compass Needle (Centered) -->
     <ImageView
         android:id="@+id/compassNeedle"
         android:layout_width="125dp"
         android:layout_height="125dp"
-        android:layout_marginTop="50dp"
         android:contentDescription="Compass Needle"
         app:srcCompat="@drawable/compass_icon_v2_arrow"
-        app:layout_constraintTop_toBottomOf="@+id/btnMap"
-        app:layout_constraintBottom_toTopOf="@+id/degreeText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Degree thing -->
+    <!-- Degree View -->
     <TextView
         android:id="@+id/degreeView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="125dp"
-        app:layout_constraintTop_toBottomOf="@id/compassNeedle"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/compassNeedleBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:textColor="#FFFFFF"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:text="Rotation Degree"/>
 
     <!-- Direction and Coordinates Text -->
@@ -98,6 +95,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Altitude Text -->
     <TextView
         android:id="@+id/altitudeText"
         android:layout_width="wrap_content"
@@ -111,17 +109,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-<!--    <TextView-->
-<!--        android:id="@+id/pressureText"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:text="Pressure: &#45;&#45; hPa"-->
-<!--        android:textColor="#FFFFFF"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="16sp"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/altitudeText"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"/>-->
+    <!-- Uncomment for now
+    <TextView
+        android:id="@+id/pressureText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Pressure: - hPa"
+        android:textColor="#FFFFFF"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/altitudeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
