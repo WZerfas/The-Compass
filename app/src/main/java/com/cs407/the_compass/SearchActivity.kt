@@ -130,133 +130,39 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-        private fun isLocationEnabled(): Boolean {
+    private fun isLocationEnabled(): Boolean {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        }
-/**
-package com.cs407.the_compass
-
-
-import android.content.Context
-import android.content.Intent
-import android.location.Geocoder
-import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import android.view.View
-import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
-
-class SearchActivity : AppCompatActivity() {
-    private var searchingCoordinate = false
-    private lateinit var searchEditText: EditText
-    private lateinit var confirmButton: ImageView
-    private lateinit var returnButton: ImageView
-    private lateinit var searchModeSwitch: Switch
-    private lateinit var modeTextView: TextView
-    private lateinit var favoriteButton: ImageView
-
-    private lateinit var suggestionsListView: ListView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
-
-        searchEditText = findViewById(R.id.searchText)
-        confirmButton = findViewById(R.id.btnConfirmSearch)
-        returnButton = findViewById(R.id.btnReturn)
-        searchModeSwitch = findViewById(R.id.searchModeSwitch)
-        modeTextView = findViewById(R.id.modeTextView)
-        suggestionsListView = findViewById(R.id.suggestionsList)
-        favoriteButton = findViewById(R.id.btnFavorite)
-
-        searchModeSwitch.isChecked = searchingCoordinate
-        updateMode()
-
-        searchModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            searchingCoordinate = isChecked
-            updateMode()
-        }
-
-        returnButton.setOnClickListener {
-            finish()
-        }
-
-        favoriteButton.setOnClickListener{
-            val sharedPreferenceFavor = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
-            val favoriteLocation = sharedPreferenceFavor.getString("favorite", null)
-            if (favoriteLocation == null){
-                Toast.makeText(this, "You haven't added a favorite location yet", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            searchEditText.setText(favoriteLocation)
-        }
-
-        confirmButton.setOnClickListener {
-            val userInputText = searchEditText.text.toString()
-            if (userInputText.isNotEmpty()) {
-                if (searchingCoordinate) {
-                    // Coordinate Mode
-                    handleCoordinateInput(userInputText)
-                } else {
-                    // Address Mode
-                    handleAddressInput(userInputText)
-                }
-            } else {
-                Toast.makeText(this, "Please enter an address or coordinates!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                if (!searchingCoordinate) { // Only for Address Mode
-                    val userInput = s.toString()
-                    if (userInput.isNotEmpty()) {
-                        displaySuggestions(userInput)
-                    } else {
-                        suggestionsListView.visibility = View.GONE
-                    }
-                }
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
     }
 
-    */
-private fun displaySuggestions(query: String, referenceLat: Double, referenceLon: Double) {
-    val databaseAccess = DatabaseAccess.getInstance(this)
-    databaseAccess.open()
+    private fun displaySuggestions(query: String, referenceLat: Double, referenceLon: Double) {
+        val databaseAccess = DatabaseAccess.getInstance(this)
+        databaseAccess.open()
 
-    // Get matching locations with their distances
-    val matchingLocations = databaseAccess.getLocationsByQuery(query, referenceLat, referenceLon)
+        // Get matching locations with their distances
+        val matchingLocations = databaseAccess.getLocationsByQuery(query, referenceLat, referenceLon)
+        databaseAccess.close()
 
-    databaseAccess.close()
-
-    if (matchingLocations.isEmpty()) {
-        suggestionsListView.visibility = View.GONE
-    } else {
-        suggestionsListView.visibility = View.VISIBLE
+        if (matchingLocations.isEmpty()) {
+            suggestionsListView.visibility = View.GONE
+        } else {
+            suggestionsListView.visibility = View.VISIBLE
 
         // Map the locations to display name and distance in a user-friendly way
         val adapterData = matchingLocations.map { location ->
             val name = location.first
-            val (latitude, longitude, distance) = location.second  // Destructure latitude, longitude, and distance
+            val (latitude, longitude, distance) = location.second
             "${name} - ${"%.2f".format(distance)} km away"
         }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, adapterData)
-        suggestionsListView.adapter = adapter
+            suggestionsListView.adapter = adapter
 
-        suggestionsListView.setOnItemClickListener { _, _, position, _ ->
-            val selectedLocation = matchingLocations[position]
-            searchEditText.setText(selectedLocation.first)  // Fill selected location
-            suggestionsListView.visibility = View.GONE
+            suggestionsListView.setOnItemClickListener { _, _, position, _ ->
+                val selectedLocation = matchingLocations[position]
+                searchEditText.setText(selectedLocation.first)  // Fill selected location
+                suggestionsListView.visibility = View.GONE
 
             // Correctly navigate to the selected destination
             navigateToDestination(
