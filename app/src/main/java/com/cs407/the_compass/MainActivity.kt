@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val compassImage = findViewById<ImageView>(R.id.compassNeedle)
+        val compassImage = findViewById<ImageView>(R.id.compassNeedleBackground)
         val degreeTextView = findViewById<TextView>(R.id.degreeView)
         val btnMap = findViewById<ImageView>(R.id.btnMap)
         val btnSetting = findViewById<ImageView>(R.id.btnSetting)
