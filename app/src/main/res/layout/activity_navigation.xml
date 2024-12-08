@@ -51,12 +51,12 @@
         android:id="@+id/compassView"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="60dp"
         android:rotation="0"
         app:layout_constraintTop_toBottomOf="@+id/destTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/arrow_v2"/>
+        app:srcCompat="@drawable/compass_icon_v2_arrow"/>
 
     <!-- Distance TextView -->
     <TextView
