@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -71,32 +72,96 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun showInputDialog() {
-        val input = EditText(this)
-        input.hint = "Enter location name"
+        val alertDialogLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 30, 50, 30)
+        }
+
+        val input1 = EditText(this).apply {
+            hint = "Enter location name"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = 20
+            }
+        }
+
+        val input2 = EditText(this).apply {
+            hint = "Enter coordinate name"
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        alertDialogLayout.addView(input1)
+        alertDialogLayout.addView(input2)
 
         val dialog = AlertDialog.Builder(this)
             .setTitle("Add Favorite")
-            .setMessage("Enter the location you want save as favorite")
-            .setView(input)
-            .setPositiveButton("Save") { _, _ ->
-                val locationName = input.text.toString()
-                if (locationName.isNotEmpty()) {
-                    saveFavoriteLocation(locationName)
-                    Toast.makeText(this, "Location saved: $locationName", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Location cannot be empty!", Toast.LENGTH_SHORT).show()
-                }
-            }
+            .setMessage("Enter the location you want to save as favorite")
+            .setView(alertDialogLayout)
+            .setPositiveButton("Save", null)
             .setNegativeButton("Cancel", null)
             .create()
 
         dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val locationName = input1.text.toString().trim()
+            val locationCoordinate = input2.text.toString().trim()
+
+            when {
+                locationName.isNotEmpty() && locationCoordinate.isNotEmpty() -> {
+                    // Both fields filled
+                    saveToSharedPreferences(locationName, locationCoordinate)
+                    Toast.makeText(this, "Location saved with name and coordinates", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                locationName.isNotEmpty() -> {
+                    // Only name filled, clear coordinate
+                    saveToSharedPreferences(locationName, shouldClearCoordinate = true)
+                    Toast.makeText(this, "Location saved with name: $locationName", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                locationCoordinate.isNotEmpty() -> {
+                    // Only coordinate filled, clear name
+                    saveToSharedPreferences(locationCoordinate = locationCoordinate, shouldClearName = true)
+                    Toast.makeText(this, "Location saved with coordinates: $locationCoordinate", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                else -> {
+                    // Neither field filled
+                    Toast.makeText(this, "Please enter at least a location name or coordinates", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
-    private fun saveFavoriteLocation(locationName: String) {
+    private fun saveToSharedPreferences(
+        locationName: String? = null,
+        locationCoordinate: String? = null,
+        shouldClearName: Boolean = false,
+        shouldClearCoordinate: Boolean = false
+    ) {
         val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("favorite", locationName)
+
+        // Handle location name
+        if (shouldClearName) {
+            editor.remove("favoriteName")
+        } else {
+            locationName?.let { editor.putString("favoriteName", it) }
+        }
+
+        // Handle location coordinate
+        if (shouldClearCoordinate) {
+            editor.remove("favoriteCoordinate")
+        } else {
+            locationCoordinate?.let { editor.putString("favoriteCoordinate", it) }
+        }
+
         editor.apply()
     }
 
