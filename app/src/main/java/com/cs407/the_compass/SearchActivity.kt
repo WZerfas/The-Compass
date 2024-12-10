@@ -119,6 +119,39 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+    private fun saveSearchHistory(latitude: Double, longitude: Double, destinationName: String? = null) {
+        // Check if logging is enabled
+        val settingsPrefs = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+        val isLoggingEnabled = settingsPrefs.getBoolean("locationLogEnabled", false)
+
+        if (!isLoggingEnabled) {
+            return
+        }
+
+        val historyPrefs = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+        val editor = historyPrefs.edit()
+
+        // Shift existing entries down
+        for (i in 4 downTo 1) {
+            val prevLat = historyPrefs.getString("locationLogLat${i}", null)
+            val prevLon = historyPrefs.getString("locationLogLon${i}", null)
+            val prevName = historyPrefs.getString("locationLogName${i}", null)
+
+            if (prevLat != null && prevLon != null) {
+                editor.putString("locationLogLat${i + 1}", prevLat)
+                editor.putString("locationLogLon${i + 1}", prevLon)
+                editor.putString("locationLogName${i + 1}", prevName)
+            }
+        }
+
+        // Add new entry at position 1
+        editor.putString("locationLogLat1", latitude.toString())
+        editor.putString("locationLogLon1", longitude.toString())
+        editor.putString("locationLogName1", destinationName)
+
+        editor.apply()
+    }
+
     private fun getUserLocation() {
         if (isLocationEnabled()) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
@@ -255,6 +288,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun navigateToDestination(latitude: Double, longitude: Double, destinationName: String? = null) {
         Log.d("SearchActivity","Navigation to destination: latitude=$latitude, longitude=$longitude, name=$destinationName")
+        saveSearchHistory(latitude, longitude, destinationName)
         val intent = Intent(this, NavigationActivity::class.java).apply {
             putExtra("latitude", latitude)
             putExtra("longitude", longitude)

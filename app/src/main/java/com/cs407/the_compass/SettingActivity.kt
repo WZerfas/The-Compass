@@ -29,6 +29,20 @@ class SettingActivity : AppCompatActivity() {
         val logStatusText = findViewById<TextView>(R.id.LogstatusText)
         val alertStatusText = findViewById<TextView>(R.id.alertStatText)
         val bookMarkFavorateText = findViewById<TextView>(R.id.bookMarkFavorateText)
+        val clearLocationLogText = findViewById<TextView>(R.id.clearLocationLogText)
+
+        clearLocationLogText.setOnClickListener {
+            // Show confirmation dialog before clearing
+            AlertDialog.Builder(this)
+                .setTitle("Clear Search History")
+                .setMessage("Are you sure you want to clear all search history?")
+                .setPositiveButton("Clear") { _, _ ->
+                    clearSearchHistory()
+                    Toast.makeText(this, "LocationLog cleared", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
 
         btnHome.setOnClickListener {
             finish()
@@ -165,8 +179,17 @@ class SettingActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    companion object {
-        private const val REQUEST_NOTIFICATION_PERMISSION = 1
-        private const val REQUEST_PHONE_STATE_PERMISSION = 2
+    private fun clearSearchHistory() {
+        val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // Clear all location log entries (1-5)
+        for (i in 1..5) {
+            editor.remove("locationLogLat$i")
+            editor.remove("locationLogLon$i")
+            editor.remove("locationLogName$i")
+        }
+
+        editor.apply()
     }
 }

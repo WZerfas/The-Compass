@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             if (isLocationLogEnabled == false){
                 Toast.makeText(this, "Log function not enabled", Toast.LENGTH_SHORT).show()
             }else{
-                Toast.makeText(this, "Enter the log (PlaceHolder)", Toast.LENGTH_SHORT).show()
+                showSearchHistoryDialog()
             }
         }
 
@@ -194,4 +194,44 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun showSearchHistoryDialog() {
+        val sharedPreferences = getSharedPreferences("StoredPreferences", MODE_PRIVATE)
+        val isLocationLogEnabled = sharedPreferences.getBoolean("locationLogEnabled", false)
+
+        if (!isLocationLogEnabled) {
+            Toast.makeText(this, "Log function not enabled", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Build list of logged locations
+        val historyList = mutableListOf<String>()
+        for (i in 1..5) {
+            val lat = sharedPreferences.getString("locationLogLat$i", null)
+            val lon = sharedPreferences.getString("locationLogLon$i", null)
+            val name = sharedPreferences.getString("locationLogName$i", null)
+
+            if (lat != null && lon != null) {
+                val entry = if (name != null) {
+                    "Location: $name\nCoordinates: $lat, $lon"
+                } else {
+                    "Coordinates: $lat, $lon"
+                }
+                historyList.add(entry)
+            }
+        }
+
+        if (historyList.isEmpty()) {
+            Toast.makeText(this, "No log available", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Create and show dialog with search history
+        AlertDialog.Builder(this)
+            .setTitle("Location Log")
+            .setItems(historyList.toTypedArray(), null)
+            .setPositiveButton("Close", null)
+            .show()
+    }
+
 }
