@@ -18,6 +18,7 @@ import com.cs407.the_compass.util.CompassManager
 import com.cs407.the_compass.util.CurrentLocation
 import com.cs407.the_compass.util.ElevationManager
 import com.cs407.the_compass.util.NotificationUtils
+import com.cs407.the_compass.util.SignalMonitorService
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {
@@ -123,6 +124,11 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize the database access
         val databaseAccess = DatabaseAccess.getInstance(this)
+        // Create notification channel for signal alerts
+        NotificationUtils.createNotificationChannel(this)
+
+        // Start signal monitoring service
+        SignalMonitorService.startService(this)
     }
 
     override fun onResume() {
@@ -136,6 +142,12 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         compassManager.stop()
         elevationManager.stopListening()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Stop signal monitoring service if app is being destroyed
+        SignalMonitorService.stopService(this)
     }
 
     private fun convertToDMS(coordinate: Double, isLatitude: Boolean): String {

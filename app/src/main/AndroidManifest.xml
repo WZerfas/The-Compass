@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+
 
     <application
         android:allowBackup="true"
@@ -33,6 +36,10 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
+        <service
+            android:name=".util.SignalMonitorService"
+            android:enabled="true"
+            android:exported="false" />
         <activity
             android:name=".SearchActivity"
             android:exported="false" />
