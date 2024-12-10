@@ -1,15 +1,15 @@
 package com.cs407.the_compass
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log // For logging
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import android.Manifest
-import android.content.Context
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentLocation: CurrentLocation
     private lateinit var elevationManager: ElevationManager
     private lateinit var altitudeTextView: TextView
-    //private lateinit var pressureTextView: TextView
     private val fusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
 
     private val permissionLauncher = registerForActivityResult(
@@ -47,6 +46,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(this, "Notification permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (!shouldShowRationale) {
+                showNotificationPermissionDeniedDialog()
+            } else {
+                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun showPermissionDeniedDialog() {
         AlertDialog.Builder(this)
             .setTitle("Permission Required")
@@ -61,6 +78,19 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showNotificationPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Notification Permission Required")
+            .setMessage("This app requires notification permission to keep you updated on important events. Please enable it in app settings.")
+            .setPositiveButton("Open Settings") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,26 +103,22 @@ class MainActivity : AppCompatActivity() {
         val btnLog = findViewById<ImageView>(R.id.btnLog)
 
         altitudeTextView = findViewById(R.id.altitudeText)
-        //pressureTextView = findViewById(R.id.pressureText)
 
         elevationManager = ElevationManager(this) { elevation, pressure ->
             if (elevation != null && pressure != null) {
                 altitudeTextView.text = "Altitude: ${elevation.toInt()} m"
-                //pressureTextView.text = "Pressure: ${pressure.toInt()} hPa"
             } else {
                 altitudeTextView.text = "Altitude unavailable"
-                //pressureTextView.text = "Pressure unavailable"
             }
         }
 
-        compassManager = CompassManager(this){ degree, direction ->
+        compassManager = CompassManager(this) { degree, direction ->
             degreeTextView.text = "${degree.toInt()}º $direction"
             compassImage.rotation = -degree
         }
         currentLocation = CurrentLocation(this, fusedLocationProviderClient)
 
         btnMap.setOnClickListener {
-            // Navigate directly to NavigationActivity
             val intent = Intent(this, NavigationActivity::class.java)
             startActivity(intent)
         }
@@ -102,33 +128,47 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        btnLog.setOnClickListener{
+        btnLog.setOnClickListener {
             val sharedPreferenceSet = getSharedPreferences("StoredPreferences", MODE_PRIVATE)
             val isLocationLogEnabled = sharedPreferenceSet.getBoolean("locationLogEnabled", false)
-            if (isLocationLogEnabled == false){
+            if (!isLocationLogEnabled) {
                 Toast.makeText(this, "Log function not enabled", Toast.LENGTH_SHORT).show()
-            }else{
+            } else {
                 showSearchHistoryDialog()
             }
         }
 
         // Check location permission and fetch location
-        currentLocation.checkPermissionsAndFetchLocation(permissionLauncher, object: CurrentLocation.LocationResultCallback {
+        currentLocation.checkPermissionsAndFetchLocation(permissionLauncher, object : CurrentLocation.LocationResultCallback {
             override fun onLocationRetrieved(latitude: Double, longitude: Double) {
                 updateLocationUI(latitude, longitude)
             }
+
             override fun onError(message: String) {
                 Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
         })
 
-        // Initialize the database access
-        val databaseAccess = DatabaseAccess.getInstance(this)
         // Create notification channel for signal alerts
         NotificationUtils.createNotificationChannel(this)
 
+        // Request notification permission if running on Android 13 or above
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestNotificationPermissionIfNeeded()
+        }
+
         // Start signal monitoring service
         SignalMonitorService.startService(this)
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     override fun onResume() {
@@ -172,19 +212,19 @@ class MainActivity : AppCompatActivity() {
         locationTextView.text = "$latitudeDMS $longitudeDMS"
     }
 
-    private fun updateNavigationIcon(){
-        val prefs = getSharedPreferences("navigation_prefs",Context.MODE_PRIVATE)
-        val navigatioActive = prefs.getBoolean("navigation_active",false)
+    private fun updateNavigationIcon() {
+        val prefs = getSharedPreferences("navigation_prefs", Context.MODE_PRIVATE)
+        val navigationActive = prefs.getBoolean("navigation_active", false)
         val btnMap = findViewById<ImageView>(R.id.btnMap)
-        if (navigatioActive){
+        if (navigationActive) {
             btnMap.setImageResource(R.drawable.map_icon_active)
-        }else{
+        } else {
             btnMap.setImageResource(R.drawable.map_icon)
         }
     }
 
     private fun getCurrentLocation() {
-        currentLocation.fetchLocation(object: CurrentLocation.LocationResultCallback {
+        currentLocation.fetchLocation(object : CurrentLocation.LocationResultCallback {
             override fun onLocationRetrieved(latitude: Double, longitude: Double) {
                 updateLocationUI(latitude, longitude)
             }
@@ -204,7 +244,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Build list of logged locations
         val historyList = mutableListOf<String>()
         for (i in 1..5) {
             val lat = sharedPreferences.getString("locationLogLat$i", null)
@@ -226,7 +265,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Create and show dialog with search history
         AlertDialog.Builder(this)
             .setTitle("Location Log")
             .setItems(historyList.toTypedArray(), null)

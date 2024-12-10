@@ -54,6 +54,8 @@
         android:layout_marginTop="60dp"
         android:rotation="0"
         app:layout_constraintTop_toBottomOf="@+id/destTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/compass_icon_v2_arrow"/>
@@ -67,6 +69,7 @@
         android:text="Distance: -- m"
         android:textColor="@android:color/white"
         android:textSize="16sp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/compassView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -81,9 +84,11 @@
         android:textColor="#FFFFFF"
         android:textAlignment="center"
         android:textSize="16sp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/distanceTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 
     <!-- Destination TextView -->
     <TextView
@@ -93,7 +98,9 @@
         android:layout_marginTop="120dp"
         android:text="Navigation Not Active"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="22sp"
+        android:textAlignment="center"
+        android:gravity="center"
         app:layout_constraintTop_toBottomOf="@+id/btnSearch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -101,11 +108,12 @@
     <!-- End Navigation Icon at Bottom-Right -->
     <ImageView
         android:id="@+id/btnEnd"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_margin="20dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_margin="30dp"
         android:contentDescription="End Navigation Icon"
         android:src="@drawable/end_nav_icon"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 

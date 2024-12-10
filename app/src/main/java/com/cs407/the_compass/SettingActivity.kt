@@ -1,21 +1,55 @@
 package com.cs407.the_compass
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.cs407.the_compass.util.NotificationUtils
 
 class SettingActivity : AppCompatActivity() {
+
+    private lateinit var receptionAlertSwitch: Switch
+    private lateinit var alertStatusText: TextView
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permission granted, keep the switch on
+            Toast.makeText(this, "Notification permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            // Permission denied
+            val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (!shouldShowRationale) {
+                showNotificationPermissionDeniedDialog()
+            } else {
+                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show()
+            }
+
+            // Since permission was not granted, revert the switch to off
+            receptionAlertSwitch.isChecked = false
+            alertStatusText.text = "Off"
+            saveSwitchState("receptionAlertEnabled", false)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
@@ -25,9 +59,9 @@ class SettingActivity : AppCompatActivity() {
 
         val btnHome = findViewById<ImageView>(R.id.BtnReturn_Set)
         val locationLogSwitch = findViewById<Switch>(R.id.locationLogSwitch)
-        val receptionAlertSwitch = findViewById<Switch>(R.id.AlertSwitch2)
+        receptionAlertSwitch = findViewById(R.id.AlertSwitch2)
         val logStatusText = findViewById<TextView>(R.id.LogstatusText)
-        val alertStatusText = findViewById<TextView>(R.id.alertStatText)
+        alertStatusText = findViewById(R.id.alertStatText)
         val bookMarkFavorateText = findViewById<TextView>(R.id.bookMarkFavorateText)
         val clearLocationLogText = findViewById<TextView>(R.id.clearLocationLogText)
 
@@ -68,8 +102,27 @@ class SettingActivity : AppCompatActivity() {
         }
 
         receptionAlertSwitch.setOnCheckedChangeListener { _, isChecked ->
-            alertStatusText.text = if (isChecked) "On" else "Off"
-            saveSwitchState("receptionAlertEnabled", isChecked)
+            if (isChecked) {
+                // If user turns on and Android 13+, ensure notification permission is granted
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        // Request permission
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        // Already granted
+                        alertStatusText.text = "On"
+                        saveSwitchState("receptionAlertEnabled", true)
+                    }
+                } else {
+                    // For Android versions below 13, no permission required
+                    alertStatusText.text = "On"
+                    saveSwitchState("receptionAlertEnabled", true)
+                }
+            } else {
+                // Switch turned off
+                alertStatusText.text = "Off"
+                saveSwitchState("receptionAlertEnabled", false)
+            }
         }
 
         bookMarkFavorateText.setOnClickListener {
@@ -77,6 +130,19 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
+    private fun showNotificationPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Notification Permission Required")
+            .setMessage("This app requires notification permission to keep you updated on important events. Please enable it in app settings.")
+            .setPositiveButton("Open Settings") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
     private fun saveSwitchState(key: String, isChecked: Boolean) {
         val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)

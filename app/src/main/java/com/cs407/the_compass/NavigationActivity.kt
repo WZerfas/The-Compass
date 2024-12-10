@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.view.animation.AnimationUtils
 
 class NavigationActivity : AppCompatActivity() {
     private lateinit var arrowView: ImageView
@@ -34,7 +35,6 @@ class NavigationActivity : AppCompatActivity() {
     private val arrivalBuffer = 10 // in meters
     private var hasValidLocation = false
 
-    // Flag to ensure we only check arrival after receiving valid updates
     private var hasReceivedInitialUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +54,10 @@ class NavigationActivity : AppCompatActivity() {
         // Load destination from SharedPreferences
         loadDestination()
         btnEnd.visibility = if (isNavigationActive()) View.VISIBLE else View.GONE
+
+        // Set visibility based on navigation state
+        distanceTextView.visibility = if (isNavigationActive()) View.VISIBLE else View.GONE
+        currentLocationText.visibility = if (isNavigationActive()) View.VISIBLE else View.GONE
 
         processIntentData(intent)
 
@@ -79,6 +83,11 @@ class NavigationActivity : AppCompatActivity() {
         navigationUpdateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == "com.cs407.the_compass.UPDATE_NAVIGATION") {
+                    if (!isNavigationActive()) {
+                        // Navigation is not active; ignore the broadcast
+                        return
+                    }
+
                     val distance = intent.getFloatExtra("distance", 0f)
                     val direction = intent.getStringExtra("direction") ?: "--"
                     val destinationNameExtra = intent.getStringExtra("destinationName") ?: "Unknown Location"
@@ -89,7 +98,7 @@ class NavigationActivity : AppCompatActivity() {
                     val currentLon = intent.getDoubleExtra("currentLon", Double.NaN)
 
                     distanceTextView.text = "Distance: ${distance.toInt()} m"
-                    destTextView.text = "Navigating to: $destinationNameExtra"
+                    destTextView.text = "Navigating to:\n$destinationNameExtra"
 
                     // Convert to DMS if valid
                     if (!currentLat.isNaN() && !currentLon.isNaN()) {
@@ -230,6 +239,11 @@ class NavigationActivity : AppCompatActivity() {
         currentLocationText.text = "Fetching location..."
         arrowView.rotation = 0f
         hasReceivedInitialUpdate = false
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(navigationUpdateReceiver)
+
+        distanceTextView.visibility = View.GONE
+        currentLocationText.visibility = View.GONE
     }
 
     private fun setNavigationActive(active: Boolean) {
@@ -240,6 +254,24 @@ class NavigationActivity : AppCompatActivity() {
 
         val btnEnd = findViewById<ImageView>(R.id.btnEnd)
         btnEnd.visibility = if (active) View.VISIBLE else View.GONE
+
+        // Load animations
+        val fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        val fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+
+        if (active) {
+            // Show with fade-in
+            distanceTextView.startAnimation(fadeIn)
+            currentLocationText.startAnimation(fadeIn)
+            distanceTextView.visibility = View.VISIBLE
+            currentLocationText.visibility = View.VISIBLE
+        } else {
+            // Hide with fade-out
+            distanceTextView.startAnimation(fadeOut)
+            currentLocationText.startAnimation(fadeOut)
+            distanceTextView.visibility = View.GONE
+            currentLocationText.visibility = View.GONE
+        }
 
         if (active) {
             // Start the navigation service
