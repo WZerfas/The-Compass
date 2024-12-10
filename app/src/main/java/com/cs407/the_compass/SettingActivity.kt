@@ -1,44 +1,60 @@
 package com.cs407.the_compass
 
 import android.content.Context
-import android.os.Bundle
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.cs407.the_compass.util.CompassManager
+import com.cs407.the_compass.util.NotificationUtils
 
 class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
 
+        // Initialize notification channels
+        NotificationUtils.createNotificationChannel(this)
+
         val btnHome = findViewById<ImageView>(R.id.BtnReturn_Set)
         val locationLogSwitch = findViewById<Switch>(R.id.locationLogSwitch)
+        val receptionAlertSwitch = findViewById<Switch>(R.id.AlertSwitch2)
         val logStatusText = findViewById<TextView>(R.id.LogstatusText)
+        val alertStatusText = findViewById<TextView>(R.id.alertStatText)
         val bookMarkFavorateText = findViewById<TextView>(R.id.bookMarkFavorateText)
 
         btnHome.setOnClickListener {
             finish()
         }
 
-        // Load the saved state of the switch from SharedPreferences
+        // Load saved states
         val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
+
+        // Location log switch setup
         val isLocationLogEnabled = sharedPreferences.getBoolean("locationLogEnabled", false)
         locationLogSwitch.isChecked = isLocationLogEnabled
         logStatusText.text = if (isLocationLogEnabled) "On" else "Off"
 
-        // Save switch state when toggled
+        // Reception alert switch setup
+        val isReceptionAlertEnabled = sharedPreferences.getBoolean("receptionAlertEnabled", false)
+        receptionAlertSwitch.isChecked = isReceptionAlertEnabled
+        alertStatusText.text = if (isReceptionAlertEnabled) "On" else "Off"
+
+        // Switch listeners
         locationLogSwitch.setOnCheckedChangeListener { _, isChecked ->
             logStatusText.text = if (isChecked) "On" else "Off"
-            saveSwitchState(isChecked)
+            saveSwitchState("locationLogEnabled", isChecked)
+        }
+
+        receptionAlertSwitch.setOnCheckedChangeListener { _, isChecked ->
+            alertStatusText.text = if (isChecked) "On" else "Off"
+            saveSwitchState("receptionAlertEnabled", isChecked)
         }
 
         bookMarkFavorateText.setOnClickListener {
@@ -46,10 +62,11 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveSwitchState(isChecked: Boolean) {
+
+    private fun saveSwitchState(key: String, isChecked: Boolean) {
         val sharedPreferences = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putBoolean("locationLogEnabled", isChecked)
+        editor.putBoolean(key, isChecked)
         editor.apply()
     }
 
@@ -83,4 +100,8 @@ class SettingActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    companion object {
+        private const val REQUEST_NOTIFICATION_PERMISSION = 1
+        private const val REQUEST_PHONE_STATE_PERMISSION = 2
+    }
 }
