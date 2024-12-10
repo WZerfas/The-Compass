@@ -6,28 +6,33 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.telephony.PhoneStateListener
 import android.telephony.ServiceState
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.cs407.the_compass.MainActivity
 import com.cs407.the_compass.R
+import android.content.pm.ServiceInfo
+import androidx.annotation.RequiresApi
 
 class SignalMonitorService : Service() {
-    private var lastSignalState: Boolean = true // true means has signal
+    // Signal-related fields
+    private var lastSignalState: Boolean = true
     private lateinit var telephonyManager: TelephonyManager
-    private var telephonyCallback: Any? = null
+    private var telephonyCallback: TelephonyCallback? = null
     private var isMonitoring = false
 
     companion object {
-        private const val TAG = "SignalMonitorService"
+        private const val FOREGROUND_SERVICE_ID = 1001
 
         fun startService(context: Context) {
             val intent = Intent(context, SignalMonitorService::class.java)
-            context.startService(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
         fun stopService(context: Context) {
@@ -38,110 +43,123 @@ class SignalMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "SignalMonitorService created")
         telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        startForegroundServiceWithNotification()
+        setupSignalMonitoring()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "SignalMonitorService started")
-        if (!isMonitoring) {
-            setupSignalMonitoring()
-            isMonitoring = true
-        }
         return START_STICKY
     }
 
-    private fun setupSignalMonitoring() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val callback = object : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
-                override fun onServiceStateChanged(serviceState: ServiceState) {
-                    handleSignalChange(serviceState.state == ServiceState.STATE_IN_SERVICE)
-                }
-            }
-            telephonyCallback = callback
-            try {
-                telephonyManager.registerTelephonyCallback(mainExecutor, callback)
-                Log.d(TAG, "Registered telephony callback for Android 12+")
-            } catch (e: SecurityException) {
-                Log.e(TAG, "Failed to register telephony callback: ${e.message}")
-            }
+    override fun onDestroy() {
+        super.onDestroy()
+        stopSignalMonitoring()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    // Foreground service handling
+    private fun startForegroundServiceWithNotification() {
+        val notification = buildNotification()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(FOREGROUND_SERVICE_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         } else {
-            val listener = object : PhoneStateListener() {
-                override fun onServiceStateChanged(serviceState: ServiceState) {
-                    handleSignalChange(serviceState.state == ServiceState.STATE_IN_SERVICE)
-                }
-            }
-            telephonyCallback = listener
-            telephonyManager.listen(listener, PhoneStateListener.LISTEN_SERVICE_STATE)
-            Log.d(TAG, "Registered phone state listener for pre-Android 12")
+            startForeground(FOREGROUND_SERVICE_ID, notification)
         }
     }
 
+    private fun buildNotification() = NotificationCompat.Builder(this, NotificationUtils.SIGNAL_CHANNEL_ID)
+        .setContentTitle("Reception Alert is On")
+        .setContentText("Notify When Signal Changed")
+        .setSmallIcon(R.drawable.navigation_icon)
+        .setContentIntent(createPendingIntent())
+        .setSilent(true)
+        .setOngoing(true)
+        .build()
+
+    private fun createPendingIntent(): PendingIntent {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        return PendingIntent.getActivity(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    // Signal monitoring setup and handling
+    private fun setupSignalMonitoring() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            setupModernSignalMonitoring()
+        } else {
+            stopSelf()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun setupModernSignalMonitoring() {
+        class SignalCallback : TelephonyCallback(), TelephonyCallback.ServiceStateListener {
+            override fun onServiceStateChanged(state: ServiceState) {
+                handleSignalChange(state.state == ServiceState.STATE_IN_SERVICE)
+            }
+        }
+
+        val callback = SignalCallback()
+        telephonyCallback = callback
+        try {
+            telephonyManager.registerTelephonyCallback(mainExecutor, callback)
+            isMonitoring = true
+        } catch (e: SecurityException) {
+            stopSelf()
+        }
+    }
+
+    private fun stopSignalMonitoring() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            telephonyCallback?.let { callback ->
+                telephonyManager.unregisterTelephonyCallback(callback)
+            }
+        }
+        isMonitoring = false
+    }
+
+    // Signal change handling and notifications
     private fun handleSignalChange(hasSignal: Boolean) {
         val prefs = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
         val receptionAlertEnabled = prefs.getBoolean("receptionAlertEnabled", false)
 
-        Log.d(TAG, "Signal change detected. Has signal: $hasSignal, Alerts enabled: $receptionAlertEnabled")
-
-        if (!receptionAlertEnabled) {
-            Log.d(TAG, "Reception alerts disabled, skipping notification")
-            return
-        }
-
-        if (hasSignal == lastSignalState) {
-            Log.d(TAG, "Signal state unchanged, skipping notification")
+        if (!receptionAlertEnabled || hasSignal == lastSignalState) {
             return
         }
 
         lastSignalState = hasSignal
-        showNotification(if (hasSignal) "Cellular signal restored" else "Cellular signal lost")
+        showSignalNotification(if (hasSignal) "Cellular signal restored" else "Cellular signal lost")
     }
 
-    private fun showNotification(message: String) {
-        Log.d(TAG, "Showing notification: $message")
-
+    private fun showSignalNotification(message: String) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
         val notification = NotificationCompat.Builder(this, NotificationUtils.SIGNAL_CHANNEL_ID)
             .setContentTitle("Signal Alert")
             .setContentText(message)
             .setSmallIcon(R.drawable.navigation_icon)
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(createMainActivityPendingIntent())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
         notificationManager.notify(NotificationUtils.SIGNAL_NOTIFICATION_ID, notification)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "SignalMonitorService destroyed")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            telephonyCallback?.let {
-                if (it is TelephonyCallback) {
-                    telephonyManager.unregisterTelephonyCallback(it)
-                }
-            }
-        } else {
-            telephonyCallback?.let {
-                if (it is PhoneStateListener) {
-                    telephonyManager.listen(it, PhoneStateListener.LISTEN_NONE)
-                }
-            }
+    private fun createMainActivityPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        isMonitoring = false
+        return PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
     }
-
-    override fun onBind(intent: Intent?): IBinder? = null
 }
