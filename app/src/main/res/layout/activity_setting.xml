@@ -23,8 +23,8 @@
         android:id="@+id/receptionAlertText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="232dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="228dp"
         android:text="Reception Alert"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
@@ -32,25 +32,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/bookMarkFavorateText"
+        android:id="@+id/LocationLogText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="68dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="Book Mark Favorite"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="72dp"
+        android:text="Location log"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clearLocationLogText" />
+        app:layout_constraintTop_toBottomOf="@+id/receptionAlertText" />
 
     <TextView
         android:id="@+id/clearLocationLogText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="76dp"
         android:text="Clear Location Log"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
@@ -58,16 +56,18 @@
         app:layout_constraintTop_toBottomOf="@+id/LocationLogText" />
 
     <TextView
-        android:id="@+id/LocationLogText"
+        android:id="@+id/bookMarkFavorateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="68dp"
-        android:text="Location log"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="60dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Book Mark Favorite"
         android:textColor="#FFFFFF"
         android:textSize="28sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/receptionAlertText" />
+        app:layout_constraintTop_toBottomOf="@+id/clearLocationLogText" />
 
     <TextView
         android:id="@+id/LogstatusText"
