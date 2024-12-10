@@ -74,9 +74,16 @@ class SearchActivity : AppCompatActivity() {
 
         favoriteButton.setOnClickListener {
             val sharedPreferenceFavor = getSharedPreferences("StoredPreferences", Context.MODE_PRIVATE)
-            val favoriteLocation = sharedPreferenceFavor.getString("favorite", null)
+            var favoriteLocation: String? = null
+
+            if (searchingCoordinate) {
+                favoriteLocation = sharedPreferenceFavor.getString("favoriteCoordinate", null)
+            } else {
+                favoriteLocation = sharedPreferenceFavor.getString("favoriteName", null)
+            }
+
             if (favoriteLocation == null) {
-                Toast.makeText(this, "You haven't added a favorite location yet", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You haven't added a favorite location or in wrong searching mode", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             searchEditText.setText(favoriteLocation)
