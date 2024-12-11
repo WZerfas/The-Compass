@@ -1,36 +1,36 @@
 
 1.Home
     a. When the navigation is active, change the btnMap to Red (DONE)
-    b. Find a way to ask the user to calibrate their device, by rotating their phone around, etc.
-    c. Calibrate the elevation; it is off by 15% or something
+    b. Find a way to ask the user to calibrate their device, by rotating their phone around, etc. (X)
+    c. Calibrate the elevation; it is off by 15% or something (DONE)
     d. Remove the pressure text (DONE)
 
 2.Navigation
-    a. Implement the background process
-        i. Math part for the navigation (buffer, etc.)
-    b. A page for past 24 hours (or more) location
+    a. Implement the background process (DONE)
+        i. Math part for the navigation (buffer, etc.) (X)
+    b. A page for past 24 hours (or more) location (X)
     c. Display Current Location (DONE)
     d. Hide the end navigation button when the navigation was not active (DONE)
 
 3.Setting
-    a. add Metric/Imperial switch
-    b. Implement the reception alert
+    a. add Metric/Imperial switch (X)
+    b. Implement the reception alert (DONE)
     c. Opt in/out for Location Logs (DONE)
-    d. Clear Location Logs
-    e. Add Home/Favorite Location
+    d. Clear Location Logs (DONE)
+    e. Add Home/Favorite Location (DONE)
 
 4.Search
     a. Add a close button to exit the search (DONE)
-    b. Implement Search Results dropdown
-    c. Implement a fuzzy search or regex???
-    d. A button for navigating to home, favorite, etc
+    b. Implement Search Results dropdown (DONE)
+    c. Implement a fuzzy search or regex (X)
+    d. A button for navigating to home, favorite, etc (X)
 
 5.Database
-    a. Implement a database for the search function
-    b. Implement a database for location tracking (up to 24 hours)
-    c. Implement a database for user declared location (home, favorite, etc.)
+    a. Implement a database for the search function (DONE)
+    b. Implement a database for location tracking (up to 24 hours) (X)
+    c. Implement a database for user declared location (home, favorite, etc.) (DONE)
 
 6.Other
-    a. Investigate the crash issues when switch between pages repeatedly
+    a. Investigate the crash issues when switch between pages repeatedly (DONE)
 
 
